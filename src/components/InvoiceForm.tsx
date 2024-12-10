@@ -81,7 +81,7 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
       <div className="space-y-4">
         <h3 className="font-semibold text-[#1e3a8a]">Line Items</h3>
         {lineItems.map((item, index) => (
-          <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-4 p-4 border rounded-lg">
+          <div key={index} className="grid grid-cols-1 md:grid-cols-6 gap-4 p-4 border rounded-lg">
             <div className="md:col-span-2">
               <Input
                 placeholder="Description"
@@ -111,7 +111,17 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
                 }
               />
             </div>
-            <div className="flex items-center gap-2">
+            <div>
+              <Input
+                type="number"
+                placeholder="Tax Rate %"
+                value={item.taxRate}
+                onChange={(e) =>
+                  updateLineItem(index, "taxRate", Number(e.target.value))
+                }
+              />
+            </div>
+            <div className="flex items-center">
               <Button
                 variant="destructive"
                 size="icon"
