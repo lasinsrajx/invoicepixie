@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { AdminSettings } from "@/components/AdminSettings";
+import { TemplateSelector } from "@/components/TemplateSelector";
 
 const Index = () => {
   const { toast } = useToast();
@@ -13,6 +15,7 @@ const Index = () => {
     clientName: "",
     lineItems: [{ description: "", quantity: 1, unitPrice: 0, taxRate: 6 }],
   });
+  const [template, setTemplate] = useState("modern");
 
   const handleExportPDF = async () => {
     const element = document.getElementById("invoice-preview");
@@ -45,13 +48,23 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold text-center mb-8 text-[#1e3a8a]">
-          Invoice Generator
-        </h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-[#1e3a8a]">
+            Invoice Generator
+          </h1>
+          <AdminSettings />
+        </div>
 
         {/* AdSense Placeholder */}
         <div className="w-full h-24 bg-gray-200 mb-8 rounded-lg flex items-center justify-center">
           <span className="text-gray-500">Advertisement Space</span>
+        </div>
+
+        <div className="mb-4">
+          <TemplateSelector 
+            currentTemplate={template}
+            onTemplateChange={setTemplate}
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -61,7 +74,7 @@ const Index = () => {
           <div>
             <div className="sticky top-8">
               <div id="invoice-preview">
-                <InvoicePreview {...invoiceData} />
+                <InvoicePreview {...invoiceData} template={template} />
               </div>
               <div className="mt-4 flex gap-4 justify-end">
                 <Button 
