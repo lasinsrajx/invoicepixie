@@ -66,6 +66,8 @@ export const InvoicePreview = ({
   };
 
   const styles = getTemplateStyles();
+  const bankName = localStorage.getItem("bankName") || "First National Bank";
+  const accountNumber = localStorage.getItem("accountNumber") || "XXXX-XXXX-XXXX";
 
   return (
     <Card className="p-8 bg-white shadow-lg max-w-4xl mx-auto">
@@ -90,8 +92,8 @@ export const InvoicePreview = ({
           </div>
           <div>
             <h3 className={`text-lg font-semibold mb-2 ${styles.accentColor}`}>PAYMENT INFORMATION:</h3>
-            <p className="text-gray-600">Bank: First National Bank</p>
-            <p className="text-gray-600">Account: XXXX-XXXX-XXXX</p>
+            <p className="text-gray-600">Bank: {bankName}</p>
+            <p className="text-gray-600">Account: {accountNumber}</p>
           </div>
         </div>
 
