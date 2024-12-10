@@ -10,7 +10,7 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
   const [companyName, setCompanyName] = useState("");
   const [clientName, setClientName] = useState("");
   const [lineItems, setLineItems] = useState<LineItem[]>([
-    { description: "", quantity: 1, unitPrice: 0, taxRate: 0 },
+    { description: "", quantity: 1, unitPrice: 0, taxRate: 6 },
   ]);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
   const addLineItem = () => {
     setLineItems([
       ...lineItems,
-      { description: "", quantity: 1, unitPrice: 0, taxRate: 0 },
+      { description: "", quantity: 1, unitPrice: 0, taxRate: 6 },
     ]);
   };
 
@@ -57,29 +57,31 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
     <div className="space-y-6 p-6 bg-white rounded-lg shadow-md">
       <div className="space-y-4">
         <div>
-          <Label htmlFor="companyName">Company Name</Label>
+          <Label htmlFor="companyName" className="text-[#1e3a8a] font-semibold">Company Name</Label>
           <Input
             id="companyName"
             value={companyName}
             onChange={(e) => setCompanyName(e.target.value)}
             placeholder="Your Company Name"
+            className="mt-1"
           />
         </div>
         <div>
-          <Label htmlFor="clientName">Client Name</Label>
+          <Label htmlFor="clientName" className="text-[#1e3a8a] font-semibold">Client Name</Label>
           <Input
             id="clientName"
             value={clientName}
             onChange={(e) => setClientName(e.target.value)}
             placeholder="Client Name"
+            className="mt-1"
           />
         </div>
       </div>
 
       <div className="space-y-4">
-        <h3 className="font-semibold">Line Items</h3>
+        <h3 className="font-semibold text-[#1e3a8a]">Line Items</h3>
         {lineItems.map((item, index) => (
-          <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-4 p-4 border rounded-lg">
             <div className="md:col-span-2">
               <Input
                 placeholder="Description"
@@ -110,25 +112,23 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
               />
             </div>
             <div className="flex items-center gap-2">
-              <Input
-                type="number"
-                placeholder="Tax Rate %"
-                value={item.taxRate}
-                onChange={(e) =>
-                  updateLineItem(index, "taxRate", Number(e.target.value))
-                }
-              />
               <Button
                 variant="destructive"
                 size="icon"
                 onClick={() => removeLineItem(index)}
+                className="ml-auto"
               >
                 ×
               </Button>
             </div>
           </div>
         ))}
-        <Button onClick={addLineItem}>Add Line Item</Button>
+        <Button 
+          onClick={addLineItem}
+          className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
+        >
+          Add Line Item
+        </Button>
       </div>
     </div>
   );

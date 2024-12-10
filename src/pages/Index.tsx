@@ -11,7 +11,7 @@ const Index = () => {
   const [invoiceData, setInvoiceData] = useState({
     companyName: "",
     clientName: "",
-    lineItems: [{ description: "", quantity: 1, unitPrice: 0, taxRate: 0 }],
+    lineItems: [{ description: "", quantity: 1, unitPrice: 0, taxRate: 6 }],
   });
 
   const handleExportPDF = async () => {
@@ -45,7 +45,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold text-center mb-8 text-primary">
+        <h1 className="text-3xl font-bold text-center mb-8 text-[#1e3a8a]">
           Invoice Generator
         </h1>
 
@@ -64,10 +64,16 @@ const Index = () => {
                 <InvoicePreview {...invoiceData} />
               </div>
               <div className="mt-4 flex gap-4 justify-end">
-                <Button onClick={handleExportPDF}>Export PDF</Button>
+                <Button 
+                  onClick={handleExportPDF}
+                  className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
+                >
+                  Export PDF
+                </Button>
                 <Button
                   onClick={() => window.print()}
                   variant="outline"
+                  className="border-[#1e3a8a] text-[#1e3a8a] hover:bg-[#1e3a8a]/10"
                 >
                   Print
                 </Button>

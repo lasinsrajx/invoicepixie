@@ -21,45 +21,67 @@ export const InvoicePreview = ({
   };
 
   const calculateTax = () => {
-    return lineItems.reduce(
-      (sum, item) =>
-        sum + item.quantity * item.unitPrice * (item.taxRate / 100),
-      0
-    );
+    return calculateSubtotal() * 0.06; // 6% tax rate
   };
 
   const calculateTotal = () => {
     return calculateSubtotal() + calculateTax();
   };
 
+  const currentDate = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
   return (
-    <Card className="p-6 bg-white">
-      <div className="space-y-6">
-        <div className="border-b pb-4">
-          <h2 className="text-2xl font-bold text-primary">{companyName || "Company Name"}</h2>
-          <p className="text-gray-600">Invoice for: {clientName || "Client Name"}</p>
-          <p className="text-gray-600">Date: {new Date().toLocaleDateString()}</p>
+    <Card className="p-8 bg-white shadow-lg max-w-4xl mx-auto">
+      <div className="space-y-8">
+        {/* Header */}
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-4xl font-bold mb-4">INVOICE</h1>
+            <p className="text-gray-600">Invoice Number: INV-{Math.floor(Math.random() * 10000).toString().padStart(5, '0')}</p>
+            <p className="text-gray-600">Date: {currentDate}</p>
+          </div>
+          <div className="text-right">
+            <h2 className="text-2xl font-bold text-[#1e3a8a]">{companyName || "Company Name"}</h2>
+          </div>
         </div>
 
-        <div className="space-y-4">
+        {/* Bill To & Payment Info */}
+        <div className="grid grid-cols-2 gap-8">
+          <div>
+            <h3 className="text-lg font-semibold mb-2 text-[#1e3a8a]">BILL TO:</h3>
+            <p className="font-medium">{clientName || "Client Name"}</p>
+            <p className="text-gray-600">123 Client Street</p>
+            <p className="text-gray-600">City, State 12345</p>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold mb-2 text-[#1e3a8a]">PAYMENT INFORMATION:</h3>
+            <p className="text-gray-600">Bank: First National Bank</p>
+            <p className="text-gray-600">Account: XXXX-XXXX-XXXX</p>
+          </div>
+        </div>
+
+        {/* Items Table */}
+        <div className="mt-8">
           <table className="w-full">
             <thead>
-              <tr className="text-left border-b">
-                <th className="py-2">Description</th>
-                <th className="py-2">Qty</th>
-                <th className="py-2">Price</th>
-                <th className="py-2">Tax</th>
-                <th className="py-2">Amount</th>
+              <tr className="bg-[#1e3a8a] text-white">
+                <th className="py-3 px-4 text-left">ITEM</th>
+                <th className="py-3 px-4 text-left">DESCRIPTION</th>
+                <th className="py-3 px-4 text-right">RATE</th>
+                <th className="py-3 px-4 text-right">AMOUNT</th>
               </tr>
             </thead>
             <tbody>
               {lineItems.map((item, index) => (
                 <tr key={index} className="border-b">
-                  <td className="py-2">{item.description || "Item description"}</td>
-                  <td className="py-2">{item.quantity}</td>
-                  <td className="py-2">${item.unitPrice.toFixed(2)}</td>
-                  <td className="py-2">{item.taxRate}%</td>
-                  <td className="py-2">
+                  <td className="py-3 px-4">{index + 1}</td>
+                  <td className="py-3 px-4">{item.description || "Item description"}</td>
+                  <td className="py-3 px-4 text-right">${item.unitPrice.toFixed(2)}</td>
+                  <td className="py-3 px-4 text-right">
                     ${(item.quantity * item.unitPrice).toFixed(2)}
                   </td>
                 </tr>
@@ -67,13 +89,29 @@ export const InvoicePreview = ({
             </tbody>
           </table>
 
-          <div className="space-y-2 text-right">
-            <p>Subtotal: ${calculateSubtotal().toFixed(2)}</p>
-            <p>Tax: ${calculateTax().toFixed(2)}</p>
-            <p className="text-xl font-bold">
-              Total: ${calculateTotal().toFixed(2)}
-            </p>
+          {/* Totals */}
+          <div className="mt-6 flex justify-end">
+            <div className="w-64 space-y-2">
+              <div className="flex justify-between border-b py-2">
+                <span>Subtotal:</span>
+                <span>${calculateSubtotal().toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between border-b py-2">
+                <span>Sales Tax (6%):</span>
+                <span>${calculateTax().toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between bg-[#1e3a8a] text-white py-2 px-4 mt-4">
+                <span className="font-bold">TOTAL:</span>
+                <span className="font-bold">${calculateTotal().toFixed(2)}</span>
+              </div>
+            </div>
           </div>
+        </div>
+
+        {/* Terms */}
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold mb-2 text-[#1e3a8a]">TERMS AND CONDITIONS:</h3>
+          <p className="text-gray-600">Payment is due 30 days from the invoice date.</p>
         </div>
       </div>
     </Card>
