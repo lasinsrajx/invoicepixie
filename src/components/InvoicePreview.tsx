@@ -5,6 +5,7 @@ import { LineItem } from "@/types/invoice";
 interface InvoicePreviewProps {
   companyName: string;
   clientName: string;
+  clientAddress: string;
   bankName: string;
   accountNumber: string;
   invoiceNumber: string;
@@ -17,11 +18,18 @@ interface InvoicePreviewProps {
     showLogo: boolean;
     showAddress: boolean;
   };
+  showFields?: {
+    bankInfo: boolean;
+    invoiceNumber: boolean;
+    invoiceDate: boolean;
+    paymentInfo: boolean;
+  };
 }
 
 export const InvoicePreview = ({
   companyName,
   clientName,
+  clientAddress,
   bankName,
   accountNumber,
   invoiceNumber,
@@ -33,6 +41,12 @@ export const InvoicePreview = ({
     companyAddress: "",
     showLogo: false,
     showAddress: false
+  },
+  showFields = {
+    bankInfo: true,
+    invoiceNumber: true,
+    invoiceDate: true,
+    paymentInfo: true
   }
 }: InvoicePreviewProps) => {
   const calculateSubtotal = () => {
@@ -96,8 +110,12 @@ export const InvoicePreview = ({
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-4xl font-bold mb-4">INVOICE</h1>
-            <p className="text-gray-600">Invoice Number: {invoiceNumber || 'INV-00001'}</p>
-            <p className="text-gray-600">Date: {invoiceDate || new Date().toLocaleDateString()}</p>
+            {showFields.invoiceNumber && (
+              <p className="text-gray-600">Invoice Number: {invoiceNumber || 'INV-00001'}</p>
+            )}
+            {showFields.invoiceDate && (
+              <p className="text-gray-600">Date: {invoiceDate || new Date().toLocaleDateString()}</p>
+            )}
           </div>
           <div className="text-right">
             <h2 className={`text-2xl font-bold ${styles.accentColor}`}>{companyName || "Company Name"}</h2>
@@ -111,12 +129,15 @@ export const InvoicePreview = ({
           <div>
             <h3 className={`text-lg font-semibold mb-2 ${styles.accentColor}`}>BILL TO:</h3>
             <p className="font-medium">{clientName || "Client Name"}</p>
+            <p className="text-gray-600 whitespace-pre-line">{clientAddress}</p>
           </div>
-          <div>
-            <h3 className={`text-lg font-semibold mb-2 ${styles.accentColor}`}>PAYMENT INFORMATION:</h3>
-            <p className="text-gray-600">Bank: {bankName}</p>
-            <p className="text-gray-600">Account: {accountNumber}</p>
-          </div>
+          {showFields.paymentInfo && showFields.bankInfo && (
+            <div>
+              <h3 className={`text-lg font-semibold mb-2 ${styles.accentColor}`}>PAYMENT INFORMATION:</h3>
+              <p className="text-gray-600">Bank: {bankName}</p>
+              <p className="text-gray-600">Account: {accountNumber}</p>
+            </div>
+          )}
         </div>
 
         <div className="mt-8">

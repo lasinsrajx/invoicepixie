@@ -15,11 +15,12 @@ export const AdminSettings = () => {
   const [accountNumber, setAccountNumber] = useState("XXXX-XXXX-XXXX");
 
   useEffect(() => {
-    const savedHeaderScript = localStorage.getItem("headerScript") || "";
-    const savedTopAdCode = localStorage.getItem("topAdCode") || "";
-    const savedBottomAdCode = localStorage.getItem("bottomAdCode") || "";
-    const savedBankName = localStorage.getItem("bankName") || "First National Bank";
-    const savedAccountNumber = localStorage.getItem("accountNumber") || "XXXX-XXXX-XXXX";
+    // Load settings from localStorage
+    const savedHeaderScript = localStorage.getItem("adminHeaderScript") || "";
+    const savedTopAdCode = localStorage.getItem("adminTopAdCode") || "";
+    const savedBottomAdCode = localStorage.getItem("adminBottomAdCode") || "";
+    const savedBankName = localStorage.getItem("adminBankName") || "First National Bank";
+    const savedAccountNumber = localStorage.getItem("adminAccountNumber") || "XXXX-XXXX-XXXX";
     
     setHeaderScript(savedHeaderScript);
     setTopAdCode(savedTopAdCode);
@@ -29,15 +30,16 @@ export const AdminSettings = () => {
   }, []);
 
   const saveSettings = () => {
-    localStorage.setItem("headerScript", headerScript);
-    localStorage.setItem("topAdCode", topAdCode);
-    localStorage.setItem("bottomAdCode", bottomAdCode);
-    localStorage.setItem("bankName", bankName);
-    localStorage.setItem("accountNumber", accountNumber);
+    // Save settings to localStorage with admin prefix to avoid conflicts
+    localStorage.setItem("adminHeaderScript", headerScript);
+    localStorage.setItem("adminTopAdCode", topAdCode);
+    localStorage.setItem("adminBottomAdCode", bottomAdCode);
+    localStorage.setItem("adminBankName", bankName);
+    localStorage.setItem("adminAccountNumber", accountNumber);
     
     toast({
-      title: "Settings saved",
-      description: "Your changes have been saved successfully",
+      title: "Settings saved permanently",
+      description: "Your settings have been saved and will persist across sessions",
     });
   };
 

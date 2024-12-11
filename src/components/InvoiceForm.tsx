@@ -6,11 +6,13 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { LineItem } from "@/types/invoice";
 import { LetterheadSettings } from "./LetterheadSettings";
+import { Textarea } from "@/components/ui/textarea";
 
 export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) => void }) => {
   const { toast } = useToast();
   const [companyName, setCompanyName] = useState("");
   const [clientName, setClientName] = useState("");
+  const [clientAddress, setClientAddress] = useState("");
   const [bankName, setBankName] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [invoiceNumber, setInvoiceNumber] = useState("");
@@ -28,6 +30,7 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
     bankInfo: true,
     invoiceNumber: true,
     invoiceDate: true,
+    paymentInfo: true,
   });
 
   useEffect(() => {
@@ -36,6 +39,7 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
       const parsed = JSON.parse(savedData);
       setCompanyName(parsed.companyName || "");
       setClientName(parsed.clientName || "");
+      setClientAddress(parsed.clientAddress || "");
       setBankName(parsed.bankName || "");
       setAccountNumber(parsed.accountNumber || "");
       setInvoiceNumber(parsed.invoiceNumber || "");
@@ -51,6 +55,7 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
         bankInfo: true,
         invoiceNumber: true,
         invoiceDate: true,
+        paymentInfo: true,
       });
     }
   }, []);
@@ -59,6 +64,7 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
     const data = {
       companyName,
       clientName,
+      clientAddress,
       bankName,
       accountNumber,
       invoiceNumber,
@@ -72,6 +78,7 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
   }, [
     companyName,
     clientName,
+    clientAddress,
     bankName,
     accountNumber,
     invoiceNumber,
@@ -139,6 +146,19 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
           />
         </div>
 
+        <div>
+          <Label htmlFor="clientAddress" className="text-[#1e3a8a] font-semibold">
+            Client Address
+          </Label>
+          <Textarea
+            id="clientAddress"
+            value={clientAddress}
+            onChange={(e) => setClientAddress(e.target.value)}
+            placeholder="Enter client's complete address"
+            className="mt-1"
+          />
+        </div>
+
         <div className="space-y-4 border-t pt-4">
           <h3 className="font-semibold text-[#1e3a8a]">Letterhead Settings</h3>
           <LetterheadSettings letterhead={letterhead} onUpdate={updateLetterhead} />
@@ -147,6 +167,16 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
         <div className="space-y-4 border-t pt-4">
           <h3 className="font-semibold text-[#1e3a8a]">Optional Fields</h3>
           <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="showPaymentInfo">Show Payment Information</Label>
+              <Switch
+                id="showPaymentInfo"
+                checked={showFields.paymentInfo}
+                onCheckedChange={(checked) =>
+                  setShowFields((prev) => ({ ...prev, paymentInfo: checked }))
+                }
+              />
+            </div>
             <div className="flex items-center justify-between">
               <Label htmlFor="showBankInfo">Show Bank Information</Label>
               <Switch
@@ -180,7 +210,7 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
           </div>
         </div>
 
-        {showFields.bankInfo && (
+        {showFields.paymentInfo && showFields.bankInfo && (
           <>
             <div>
               <Label htmlFor="bankName" className="text-[#1e3a8a] font-semibold">
