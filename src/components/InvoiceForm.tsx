@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { LineItem } from "@/types/invoice";
+import { LetterheadSettings } from "./LetterheadSettings";
 
 export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) => void }) => {
   const { toast } = useToast();
@@ -16,6 +18,17 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
   const [lineItems, setLineItems] = useState<LineItem[]>([
     { description: "", quantity: 1, unitPrice: 0, taxRate: 6 },
   ]);
+  const [letterhead, setLetterhead] = useState({
+    logo: "",
+    companyAddress: "",
+    showLogo: false,
+    showAddress: false,
+  });
+  const [showFields, setShowFields] = useState({
+    bankInfo: true,
+    invoiceNumber: true,
+    invoiceDate: true,
+  });
 
   useEffect(() => {
     const savedData = localStorage.getItem("invoiceData");
@@ -28,22 +41,50 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
       setInvoiceNumber(parsed.invoiceNumber || "");
       setInvoiceDate(parsed.invoiceDate || "");
       setLineItems(parsed.lineItems || []);
+      setLetterhead(parsed.letterhead || {
+        logo: "",
+        companyAddress: "",
+        showLogo: false,
+        showAddress: false,
+      });
+      setShowFields(parsed.showFields || {
+        bankInfo: true,
+        invoiceNumber: true,
+        invoiceDate: true,
+      });
     }
   }, []);
 
   useEffect(() => {
-    const data = { 
-      companyName, 
-      clientName, 
+    const data = {
+      companyName,
+      clientName,
       bankName,
       accountNumber,
       invoiceNumber,
       invoiceDate,
-      lineItems 
+      lineItems,
+      letterhead,
+      showFields,
     };
     localStorage.setItem("invoiceData", JSON.stringify(data));
     onUpdateInvoice(data);
-  }, [companyName, clientName, bankName, accountNumber, invoiceNumber, invoiceDate, lineItems, onUpdateInvoice]);
+  }, [
+    companyName,
+    clientName,
+    bankName,
+    accountNumber,
+    invoiceNumber,
+    invoiceDate,
+    lineItems,
+    letterhead,
+    showFields,
+    onUpdateInvoice,
+  ]);
+
+  const updateLetterhead = (field: string, value: any) => {
+    setLetterhead((prev) => ({ ...prev, [field]: value }));
+  };
 
   const addLineItem = () => {
     setLineItems([
@@ -73,7 +114,9 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
     <div className="space-y-6 p-6 bg-white rounded-lg shadow-md">
       <div className="space-y-4">
         <div>
-          <Label htmlFor="companyName" className="text-[#1e3a8a] font-semibold">Company Name</Label>
+          <Label htmlFor="companyName" className="text-[#1e3a8a] font-semibold">
+            Company Name
+          </Label>
           <Input
             id="companyName"
             value={companyName}
@@ -82,8 +125,11 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
             className="mt-1"
           />
         </div>
+
         <div>
-          <Label htmlFor="clientName" className="text-[#1e3a8a] font-semibold">Client Name</Label>
+          <Label htmlFor="clientName" className="text-[#1e3a8a] font-semibold">
+            Client Name
+          </Label>
           <Input
             id="clientName"
             value={clientName}
@@ -92,46 +138,106 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
             className="mt-1"
           />
         </div>
-        <div>
-          <Label htmlFor="bankName" className="text-[#1e3a8a] font-semibold">Bank Name</Label>
-          <Input
-            id="bankName"
-            value={bankName}
-            onChange={(e) => setBankName(e.target.value)}
-            placeholder="Bank Name"
-            className="mt-1"
-          />
+
+        <div className="space-y-4 border-t pt-4">
+          <h3 className="font-semibold text-[#1e3a8a]">Letterhead Settings</h3>
+          <LetterheadSettings letterhead={letterhead} onUpdate={updateLetterhead} />
         </div>
-        <div>
-          <Label htmlFor="accountNumber" className="text-[#1e3a8a] font-semibold">Account Number</Label>
-          <Input
-            id="accountNumber"
-            value={accountNumber}
-            onChange={(e) => setAccountNumber(e.target.value)}
-            placeholder="Account Number"
-            className="mt-1"
-          />
+
+        <div className="space-y-4 border-t pt-4">
+          <h3 className="font-semibold text-[#1e3a8a]">Optional Fields</h3>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="showBankInfo">Show Bank Information</Label>
+              <Switch
+                id="showBankInfo"
+                checked={showFields.bankInfo}
+                onCheckedChange={(checked) =>
+                  setShowFields((prev) => ({ ...prev, bankInfo: checked }))
+                }
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="showInvoiceNumber">Show Invoice Number</Label>
+              <Switch
+                id="showInvoiceNumber"
+                checked={showFields.invoiceNumber}
+                onCheckedChange={(checked) =>
+                  setShowFields((prev) => ({ ...prev, invoiceNumber: checked }))
+                }
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="showInvoiceDate">Show Invoice Date</Label>
+              <Switch
+                id="showInvoiceDate"
+                checked={showFields.invoiceDate}
+                onCheckedChange={(checked) =>
+                  setShowFields((prev) => ({ ...prev, invoiceDate: checked }))
+                }
+              />
+            </div>
+          </div>
         </div>
-        <div>
-          <Label htmlFor="invoiceNumber" className="text-[#1e3a8a] font-semibold">Invoice Number</Label>
-          <Input
-            id="invoiceNumber"
-            value={invoiceNumber}
-            onChange={(e) => setInvoiceNumber(e.target.value)}
-            placeholder="INV-00001"
-            className="mt-1"
-          />
-        </div>
-        <div>
-          <Label htmlFor="invoiceDate" className="text-[#1e3a8a] font-semibold">Invoice Date</Label>
-          <Input
-            id="invoiceDate"
-            type="date"
-            value={invoiceDate}
-            onChange={(e) => setInvoiceDate(e.target.value)}
-            className="mt-1"
-          />
-        </div>
+
+        {showFields.bankInfo && (
+          <>
+            <div>
+              <Label htmlFor="bankName" className="text-[#1e3a8a] font-semibold">
+                Bank Name
+              </Label>
+              <Input
+                id="bankName"
+                value={bankName}
+                onChange={(e) => setBankName(e.target.value)}
+                placeholder="Bank Name"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="accountNumber" className="text-[#1e3a8a] font-semibold">
+                Account Number
+              </Label>
+              <Input
+                id="accountNumber"
+                value={accountNumber}
+                onChange={(e) => setAccountNumber(e.target.value)}
+                placeholder="Account Number"
+                className="mt-1"
+              />
+            </div>
+          </>
+        )}
+
+        {showFields.invoiceNumber && (
+          <div>
+            <Label htmlFor="invoiceNumber" className="text-[#1e3a8a] font-semibold">
+              Invoice Number
+            </Label>
+            <Input
+              id="invoiceNumber"
+              value={invoiceNumber}
+              onChange={(e) => setInvoiceNumber(e.target.value)}
+              placeholder="INV-00001"
+              className="mt-1"
+            />
+          </div>
+        )}
+
+        {showFields.invoiceDate && (
+          <div>
+            <Label htmlFor="invoiceDate" className="text-[#1e3a8a] font-semibold">
+              Invoice Date
+            </Label>
+            <Input
+              id="invoiceDate"
+              type="date"
+              value={invoiceDate}
+              onChange={(e) => setInvoiceDate(e.target.value)}
+              className="mt-1"
+            />
+          </div>
+        )}
       </div>
 
       <div className="space-y-4">

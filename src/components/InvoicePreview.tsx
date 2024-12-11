@@ -11,6 +11,12 @@ interface InvoicePreviewProps {
   invoiceDate: string;
   lineItems: LineItem[];
   template?: string;
+  letterhead?: {
+    logo: string;
+    companyAddress: string;
+    showLogo: boolean;
+    showAddress: boolean;
+  };
 }
 
 export const InvoicePreview = ({
@@ -21,7 +27,13 @@ export const InvoicePreview = ({
   invoiceNumber,
   invoiceDate,
   lineItems,
-  template = "modern"
+  template = "modern",
+  letterhead = {
+    logo: "",
+    companyAddress: "",
+    showLogo: false,
+    showAddress: false
+  }
 }: InvoicePreviewProps) => {
   const calculateSubtotal = () => {
     return lineItems.reduce(
@@ -75,6 +87,12 @@ export const InvoicePreview = ({
   return (
     <Card className="p-8 bg-white shadow-lg max-w-[210mm] mx-auto" id="invoice-preview">
       <div className="space-y-8">
+        {letterhead.showLogo && letterhead.logo && (
+          <div className="flex justify-end">
+            <img src={letterhead.logo} alt="Company Logo" className="h-16 object-contain" />
+          </div>
+        )}
+
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-4xl font-bold mb-4">INVOICE</h1>
@@ -83,6 +101,9 @@ export const InvoicePreview = ({
           </div>
           <div className="text-right">
             <h2 className={`text-2xl font-bold ${styles.accentColor}`}>{companyName || "Company Name"}</h2>
+            {letterhead.showAddress && letterhead.companyAddress && (
+              <p className="text-gray-600 mt-2">{letterhead.companyAddress}</p>
+            )}
           </div>
         </div>
 
