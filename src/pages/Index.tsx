@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { InvoiceForm } from "@/components/InvoiceForm";
 import { InvoicePreview } from "@/components/InvoicePreview";
 import { Button } from "@/components/ui/button";
@@ -7,13 +7,14 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { AdminSettings } from "@/components/AdminSettings";
 import { TemplateSelector } from "@/components/TemplateSelector";
+import { Footer } from "@/components/Footer";
 
 const Index = () => {
   const { toast } = useToast();
   const [invoiceData, setInvoiceData] = useState({
     companyName: "",
     clientName: "",
-    clientAddress: "", // Added the missing clientAddress field
+    clientAddress: "",
     bankName: "",
     accountNumber: "",
     invoiceNumber: "",
@@ -21,6 +22,16 @@ const Index = () => {
     lineItems: [{ description: "", quantity: 1, unitPrice: 0, taxRate: 6 }],
   });
   const [template, setTemplate] = useState("modern");
+  const [topAdCode, setTopAdCode] = useState("");
+  const [bottomAdCode, setBottomAdCode] = useState("");
+
+  useEffect(() => {
+    // Load ad codes from localStorage
+    const savedTopAdCode = localStorage.getItem("adminTopAdCode") || "";
+    const savedBottomAdCode = localStorage.getItem("adminBottomAdCode") || "";
+    setTopAdCode(savedTopAdCode);
+    setBottomAdCode(savedBottomAdCode);
+  }, []);
 
   const handleExportPDF = async () => {
     const element = document.getElementById("invoice-preview");
@@ -80,14 +91,21 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-[#1e3a8a]">
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8">
+          <h1 className="text-3xl font-bold text-[#1e3a8a] mb-4 lg:mb-0">
             Invoice Generator
           </h1>
           <AdminSettings />
         </div>
+
+        {topAdCode && (
+          <div 
+            className="mb-8 w-full overflow-hidden"
+            dangerouslySetInnerHTML={{ __html: topAdCode }}
+          />
+        )}
 
         <div className="mb-4">
           <TemplateSelector 
@@ -97,12 +115,12 @@ const Index = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div>
+          <div className="w-full">
             <InvoiceForm onUpdateInvoice={setInvoiceData} />
           </div>
-          <div>
+          <div className="w-full">
             <div className="sticky top-8">
-              <div id="invoice-preview">
+              <div id="invoice-preview" className="bg-white rounded-lg shadow-lg p-6">
                 <InvoicePreview {...invoiceData} template={template} />
               </div>
               <div className="mt-4 flex gap-4 justify-end">
@@ -116,7 +134,15 @@ const Index = () => {
             </div>
           </div>
         </div>
+
+        {bottomAdCode && (
+          <div 
+            className="mt-8 w-full overflow-hidden"
+            dangerouslySetInnerHTML={{ __html: bottomAdCode }}
+          />
+        )}
       </div>
+      <Footer />
     </div>
   );
 };
