@@ -13,6 +13,7 @@ const Index = () => {
   const [invoiceData, setInvoiceData] = useState({
     companyName: "",
     clientName: "",
+    clientAddress: "", // Added the missing clientAddress field
     bankName: "",
     accountNumber: "",
     invoiceNumber: "",
