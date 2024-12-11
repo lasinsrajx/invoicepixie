@@ -26,22 +26,42 @@ const Index = () => {
     if (!element) return;
 
     try {
+      // Set specific dimensions for A4
+      const a4Width = 210; // mm
+      const a4Height = 297; // mm
+      const quality = 2; // Higher quality for better resolution
+
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: quality,
         useCORS: true,
+        logging: false, // Disable logging for better performance
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
       });
       
-      const imgData = canvas.toDataURL("image/png");
+      // Create PDF with A4 dimensions
       const pdf = new jsPDF({
-        format: "a4",
-        unit: "mm",
+        format: 'a4',
+        unit: 'mm',
       });
 
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      // Calculate dimensions to fit A4 while maintaining aspect ratio
+      const imgWidth = a4Width;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      // If height is greater than A4 height, scale down to fit
+      const scaleFactor = imgHeight > a4Height ? a4Height / imgHeight : 1;
+      const finalWidth = imgWidth * scaleFactor;
+      const finalHeight = imgHeight * scaleFactor;
+
+      // Center the content on the page
+      const xPosition = (a4Width - finalWidth) / 2;
+      const yPosition = (a4Height - finalHeight) / 2;
+
+      // Add image to PDF
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      pdf.addImage(imgData, 'JPEG', xPosition, yPosition, finalWidth, finalHeight, undefined, 'FAST');
+      
       pdf.save("invoice.pdf");
       
       toast({
