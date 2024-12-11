@@ -9,6 +9,10 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
   const { toast } = useToast();
   const [companyName, setCompanyName] = useState("");
   const [clientName, setClientName] = useState("");
+  const [bankName, setBankName] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [invoiceDate, setInvoiceDate] = useState("");
   const [lineItems, setLineItems] = useState<LineItem[]>([
     { description: "", quantity: 1, unitPrice: 0, taxRate: 6 },
   ]);
@@ -19,15 +23,27 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
       const parsed = JSON.parse(savedData);
       setCompanyName(parsed.companyName || "");
       setClientName(parsed.clientName || "");
+      setBankName(parsed.bankName || "");
+      setAccountNumber(parsed.accountNumber || "");
+      setInvoiceNumber(parsed.invoiceNumber || "");
+      setInvoiceDate(parsed.invoiceDate || "");
       setLineItems(parsed.lineItems || []);
     }
   }, []);
 
   useEffect(() => {
-    const data = { companyName, clientName, lineItems };
+    const data = { 
+      companyName, 
+      clientName, 
+      bankName,
+      accountNumber,
+      invoiceNumber,
+      invoiceDate,
+      lineItems 
+    };
     localStorage.setItem("invoiceData", JSON.stringify(data));
     onUpdateInvoice(data);
-  }, [companyName, clientName, lineItems, onUpdateInvoice]);
+  }, [companyName, clientName, bankName, accountNumber, invoiceNumber, invoiceDate, lineItems, onUpdateInvoice]);
 
   const addLineItem = () => {
     setLineItems([
@@ -73,6 +89,46 @@ export const InvoiceForm = ({ onUpdateInvoice }: { onUpdateInvoice: (data: any) 
             value={clientName}
             onChange={(e) => setClientName(e.target.value)}
             placeholder="Client Name"
+            className="mt-1"
+          />
+        </div>
+        <div>
+          <Label htmlFor="bankName" className="text-[#1e3a8a] font-semibold">Bank Name</Label>
+          <Input
+            id="bankName"
+            value={bankName}
+            onChange={(e) => setBankName(e.target.value)}
+            placeholder="Bank Name"
+            className="mt-1"
+          />
+        </div>
+        <div>
+          <Label htmlFor="accountNumber" className="text-[#1e3a8a] font-semibold">Account Number</Label>
+          <Input
+            id="accountNumber"
+            value={accountNumber}
+            onChange={(e) => setAccountNumber(e.target.value)}
+            placeholder="Account Number"
+            className="mt-1"
+          />
+        </div>
+        <div>
+          <Label htmlFor="invoiceNumber" className="text-[#1e3a8a] font-semibold">Invoice Number</Label>
+          <Input
+            id="invoiceNumber"
+            value={invoiceNumber}
+            onChange={(e) => setInvoiceNumber(e.target.value)}
+            placeholder="INV-00001"
+            className="mt-1"
+          />
+        </div>
+        <div>
+          <Label htmlFor="invoiceDate" className="text-[#1e3a8a] font-semibold">Invoice Date</Label>
+          <Input
+            id="invoiceDate"
+            type="date"
+            value={invoiceDate}
+            onChange={(e) => setInvoiceDate(e.target.value)}
             className="mt-1"
           />
         </div>

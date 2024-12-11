@@ -5,6 +5,10 @@ import { LineItem } from "@/types/invoice";
 interface InvoicePreviewProps {
   companyName: string;
   clientName: string;
+  bankName: string;
+  accountNumber: string;
+  invoiceNumber: string;
+  invoiceDate: string;
   lineItems: LineItem[];
   template?: string;
 }
@@ -12,6 +16,10 @@ interface InvoicePreviewProps {
 export const InvoicePreview = ({
   companyName,
   clientName,
+  bankName,
+  accountNumber,
+  invoiceNumber,
+  invoiceDate,
   lineItems,
   template = "modern"
 }: InvoicePreviewProps) => {
@@ -23,18 +31,15 @@ export const InvoicePreview = ({
   };
 
   const calculateTax = () => {
-    return calculateSubtotal() * 0.06;
+    return lineItems.reduce(
+      (sum, item) => sum + (item.quantity * item.unitPrice * (item.taxRate / 100)),
+      0
+    );
   };
 
   const calculateTotal = () => {
     return calculateSubtotal() + calculateTax();
   };
-
-  const currentDate = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
 
   const getTemplateStyles = () => {
     switch (template) {
@@ -66,17 +71,15 @@ export const InvoicePreview = ({
   };
 
   const styles = getTemplateStyles();
-  const bankName = localStorage.getItem("bankName") || "First National Bank";
-  const accountNumber = localStorage.getItem("accountNumber") || "XXXX-XXXX-XXXX";
 
   return (
-    <Card className="p-8 bg-white shadow-lg max-w-4xl mx-auto">
+    <Card className="p-8 bg-white shadow-lg max-w-[210mm] mx-auto" id="invoice-preview">
       <div className="space-y-8">
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-4xl font-bold mb-4">INVOICE</h1>
-            <p className="text-gray-600">Invoice Number: INV-{Math.floor(Math.random() * 10000).toString().padStart(5, '0')}</p>
-            <p className="text-gray-600">Date: {currentDate}</p>
+            <p className="text-gray-600">Invoice Number: {invoiceNumber || 'INV-00001'}</p>
+            <p className="text-gray-600">Date: {invoiceDate || new Date().toLocaleDateString()}</p>
           </div>
           <div className="text-right">
             <h2 className={`text-2xl font-bold ${styles.accentColor}`}>{companyName || "Company Name"}</h2>
@@ -87,8 +90,6 @@ export const InvoicePreview = ({
           <div>
             <h3 className={`text-lg font-semibold mb-2 ${styles.accentColor}`}>BILL TO:</h3>
             <p className="font-medium">{clientName || "Client Name"}</p>
-            <p className="text-gray-600">123 Client Street</p>
-            <p className="text-gray-600">City, State 12345</p>
           </div>
           <div>
             <h3 className={`text-lg font-semibold mb-2 ${styles.accentColor}`}>PAYMENT INFORMATION:</h3>
@@ -128,7 +129,7 @@ export const InvoicePreview = ({
                 <span>${calculateSubtotal().toFixed(2)}</span>
               </div>
               <div className="flex justify-between border-b py-2">
-                <span>Sales Tax (6%):</span>
+                <span>Tax:</span>
                 <span>${calculateTax().toFixed(2)}</span>
               </div>
               <div className={`flex justify-between ${styles.headerBg} text-white py-2 px-4 mt-4`}>
@@ -137,11 +138,6 @@ export const InvoicePreview = ({
               </div>
             </div>
           </div>
-        </div>
-
-        <div className="mt-8">
-          <h3 className={`text-lg font-semibold mb-2 ${styles.accentColor}`}>TERMS AND CONDITIONS:</h3>
-          <p className="text-gray-600">Payment is due 30 days from the invoice date.</p>
         </div>
       </div>
     </Card>
