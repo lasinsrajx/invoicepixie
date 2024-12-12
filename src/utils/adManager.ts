@@ -10,19 +10,16 @@ export const executeAdCode = (container: HTMLElement, adCode: string) => {
     // Clear existing content
     container.innerHTML = '';
     
-    // Create a wrapper div to isolate the ad content
-    const wrapper = document.createElement('div');
-    wrapper.className = 'ad-wrapper';
-    
-    // First append the wrapper
-    container.appendChild(wrapper);
-    
     // Extract only script tags from ad code
     const scriptMatch = adCode.match(/<script\b[^>]*>([\s\S]*?)<\/script>/gi);
     if (!scriptMatch) {
       console.log('No script tags found in ad code');
       return;
     }
+    
+    // First inject the non-script content
+    const contentWithoutScripts = adCode.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    container.innerHTML = contentWithoutScripts;
     
     // Load scripts sequentially
     const loadScripts = async () => {
@@ -39,10 +36,6 @@ export const executeAdCode = (container: HTMLElement, adCode: string) => {
             newScript.setAttribute(attr.name, attr.value);
           });
           
-          // Add crossorigin attribute for better error handling
-          newScript.crossOrigin = 'anonymous';
-          
-          // Copy inline script content if any
           if (originalScript.textContent) {
             newScript.textContent = originalScript.textContent;
           }
@@ -60,8 +53,8 @@ export const executeAdCode = (container: HTMLElement, adCode: string) => {
             resolve(null); // Resolve anyway to continue with other scripts
           };
           
-          // Add the script to document head
-          document.head.appendChild(newScript);
+          // Add the script to document
+          document.body.appendChild(newScript);
         });
       }
     };
@@ -83,7 +76,7 @@ export const loadAndExecuteAds = () => {
     clearTimeout((window as any).adLoadTimeout);
   }
 
-  // Add a longer delay before loading ads to ensure DOM is ready
+  // Add a delay before loading ads
   (window as any).adLoadTimeout = setTimeout(() => {
     try {
       const topAdCode = localStorage.getItem("adminTopAdCode");
@@ -108,5 +101,5 @@ export const loadAndExecuteAds = () => {
     } catch (error) {
       console.error('Error in loadAndExecuteAds:', error);
     }
-  }, 2000); // Keep 2 second delay to ensure DOM is fully ready
+  }, 1000); // Reduced to 1 second since we're being less intrusive with DOM
 };
