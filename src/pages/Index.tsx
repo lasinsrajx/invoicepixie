@@ -27,15 +27,53 @@ const Index = () => {
 
   useEffect(() => {
     // Load ad codes from localStorage
-    const savedTopAdCode = localStorage.getItem("adminTopAdCode");
-    const savedBottomAdCode = localStorage.getItem("adminBottomAdCode");
-    
-    if (savedTopAdCode) setTopAdCode(savedTopAdCode);
-    if (savedBottomAdCode) setBottomAdCode(savedBottomAdCode);
-    
-    // Log for debugging
-    console.log("Loaded top ad code:", savedTopAdCode);
-    console.log("Loaded bottom ad code:", savedBottomAdCode);
+    const loadAdCodes = () => {
+      const savedTopAdCode = localStorage.getItem("adminTopAdCode");
+      const savedBottomAdCode = localStorage.getItem("adminBottomAdCode");
+      
+      console.log("Loading top ad code:", savedTopAdCode);
+      console.log("Loading bottom ad code:", savedBottomAdCode);
+      
+      if (savedTopAdCode) {
+        setTopAdCode(savedTopAdCode);
+        // Create a new div and insert the ad code
+        const topAdContainer = document.getElementById('top-ad-container');
+        if (topAdContainer) {
+          topAdContainer.innerHTML = savedTopAdCode;
+          // Execute any scripts in the ad code
+          const scripts = topAdContainer.getElementsByTagName('script');
+          Array.from(scripts).forEach(script => {
+            const newScript = document.createElement('script');
+            Array.from(script.attributes).forEach(attr => {
+              newScript.setAttribute(attr.name, attr.value);
+            });
+            newScript.appendChild(document.createTextNode(script.innerHTML));
+            script.parentNode.replaceChild(newScript, script);
+          });
+        }
+      }
+      
+      if (savedBottomAdCode) {
+        setBottomAdCode(savedBottomAdCode);
+        // Create a new div and insert the ad code
+        const bottomAdContainer = document.getElementById('bottom-ad-container');
+        if (bottomAdContainer) {
+          bottomAdContainer.innerHTML = savedBottomAdCode;
+          // Execute any scripts in the ad code
+          const scripts = bottomAdContainer.getElementsByTagName('script');
+          Array.from(scripts).forEach(script => {
+            const newScript = document.createElement('script');
+            Array.from(script.attributes).forEach(attr => {
+              newScript.setAttribute(attr.name, attr.value);
+            });
+            newScript.appendChild(document.createTextNode(script.innerHTML));
+            script.parentNode.replaceChild(newScript, script);
+          });
+        }
+      }
+    };
+
+    loadAdCodes();
   }, []);
 
   const handleExportPDF = async () => {
@@ -105,12 +143,11 @@ const Index = () => {
           <AdminSettings />
         </div>
 
-        {topAdCode && (
-          <div 
-            className="mb-8 w-full overflow-hidden"
-            dangerouslySetInnerHTML={{ __html: topAdCode }}
-          />
-        )}
+        {/* Top Ad Container */}
+        <div 
+          id="top-ad-container"
+          className="mb-8 w-full overflow-hidden min-h-[100px]"
+        />
 
         <div className="mb-4">
           <TemplateSelector 
@@ -140,12 +177,11 @@ const Index = () => {
           </div>
         </div>
 
-        {bottomAdCode && (
-          <div 
-            className="mt-8 w-full overflow-hidden"
-            dangerouslySetInnerHTML={{ __html: bottomAdCode }}
-          />
-        )}
+        {/* Bottom Ad Container */}
+        <div 
+          id="bottom-ad-container"
+          className="mt-8 w-full overflow-hidden min-h-[100px]"
+        />
       </div>
       <Footer />
     </div>
