@@ -14,47 +14,62 @@ export const executeAdCode = (container: HTMLElement, adCode: string) => {
     const wrapper = document.createElement('div');
     wrapper.className = 'ad-wrapper';
     
-    // Set the ad code
-    wrapper.innerHTML = adCode;
+    // Extract container ID from ad code if present
+    const containerIdMatch = adCode.match(/id="([^"]+)"/);
+    if (containerIdMatch && containerIdMatch[1]) {
+      wrapper.id = containerIdMatch[1];
+    }
     
-    // Get all scripts from the wrapper
-    const scripts = Array.from(wrapper.getElementsByTagName('script'));
-    
-    // Remove scripts from wrapper (we'll re-add them properly)
-    scripts.forEach(script => script.remove());
-    
-    // Add the wrapper to container first
+    // First append the container div
     container.appendChild(wrapper);
     
-    // Now add each script properly with error handling
-    scripts.forEach(oldScript => {
-      const newScript = document.createElement('script');
-      
-      // Copy all attributes
-      Array.from(oldScript.attributes).forEach(attr => {
-        newScript.setAttribute(attr.name, attr.value);
-      });
-      
-      // Add crossorigin attribute for better error handling
-      newScript.crossOrigin = 'anonymous';
-      
-      // Add error handling
-      newScript.onerror = (error) => {
-        console.error(`Error loading ad script in ${container.id}:`, error);
-      };
-      
-      // Add load handler
-      newScript.onload = () => {
-        console.log(`Script loaded successfully in ${container.id}`);
-      };
-      
-      // Copy inline script content if any
-      if (oldScript.textContent) {
-        newScript.textContent = oldScript.textContent;
+    // Extract scripts from ad code
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = adCode;
+    const scripts = Array.from(tempDiv.getElementsByTagName('script'));
+    
+    // Set non-script content
+    wrapper.innerHTML = adCode.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    
+    // Load scripts sequentially
+    const loadScripts = async () => {
+      for (const oldScript of scripts) {
+        const newScript = document.createElement('script');
+        
+        // Copy all attributes
+        Array.from(oldScript.attributes).forEach(attr => {
+          newScript.setAttribute(attr.name, attr.value);
+        });
+        
+        // Add crossorigin attribute for better error handling
+        newScript.crossOrigin = 'anonymous';
+        
+        // Create a promise to handle script loading
+        await new Promise((resolve, reject) => {
+          newScript.onload = () => {
+            console.log(`Script loaded successfully in ${container.id}`);
+            resolve(null);
+          };
+          
+          newScript.onerror = (error) => {
+            console.error(`Error loading ad script in ${container.id}:`, error);
+            resolve(null); // Resolve anyway to continue with other scripts
+          };
+          
+          // Copy inline script content if any
+          if (oldScript.textContent) {
+            newScript.textContent = oldScript.textContent;
+          }
+          
+          // Add the script to document head
+          document.head.appendChild(newScript);
+        });
       }
-      
-      // Add the script to document head for proper execution
-      document.head.appendChild(newScript);
+    };
+    
+    // Execute scripts
+    loadScripts().catch(error => {
+      console.error('Error loading ad scripts:', error);
     });
     
     console.log(`Ad code execution completed for ${container.id}`);
@@ -69,7 +84,7 @@ export const loadAndExecuteAds = () => {
     clearTimeout((window as any).adLoadTimeout);
   }
 
-  // Add a delay before loading ads to ensure DOM is ready
+  // Add a longer delay before loading ads to ensure DOM is ready
   (window as any).adLoadTimeout = setTimeout(() => {
     try {
       const topAdCode = localStorage.getItem("adminTopAdCode");
@@ -94,5 +109,5 @@ export const loadAndExecuteAds = () => {
     } catch (error) {
       console.error('Error in loadAndExecuteAds:', error);
     }
-  }, 1000); // Increased delay to 1 second to ensure DOM is ready
+  }, 2000); // Increased delay to 2 seconds to ensure DOM is fully ready
 };
