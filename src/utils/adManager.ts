@@ -32,10 +32,15 @@ export const executeAdCode = (container: HTMLElement, adCode: string) => {
         const originalScript = tempDiv.querySelector('script');
         
         if (originalScript) {
+          // Copy all original attributes
           Array.from(originalScript.attributes).forEach(attr => {
             newScript.setAttribute(attr.name, attr.value);
           });
           
+          // Add CORS attributes
+          newScript.setAttribute('crossorigin', 'anonymous');
+          
+          // Copy content if it's an inline script
           if (originalScript.textContent) {
             newScript.textContent = originalScript.textContent;
           }
@@ -50,6 +55,9 @@ export const executeAdCode = (container: HTMLElement, adCode: string) => {
           
           newScript.onerror = (error) => {
             console.error(`Error loading ad script in ${container.id}:`, error);
+            // Log detailed error information
+            console.error('Script src:', newScript.src);
+            console.error('Script attributes:', Array.from(newScript.attributes).map(attr => `${attr.name}=${attr.value}`).join(', '));
             resolve(null); // Resolve anyway to continue with other scripts
           };
           
@@ -101,5 +109,5 @@ export const loadAndExecuteAds = () => {
     } catch (error) {
       console.error('Error in loadAndExecuteAds:', error);
     }
-  }, 1000); // Reduced to 1 second since we're being less intrusive with DOM
+  }, 1500); // Increased to 1.5 seconds to ensure DOM is ready
 };
