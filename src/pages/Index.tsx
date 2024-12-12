@@ -26,10 +26,12 @@ const Index = () => {
   const [template, setTemplate] = useState("modern");
 
   useEffect(() => {
-    // Load and execute ads when component mounts
-    loadAndExecuteAds();
+    // Initial load of ads
+    const timeoutId = setTimeout(() => {
+      loadAndExecuteAds();
+    }, 1000); // Wait for 1 second after component mount
     
-    // Also reload ads when localStorage changes
+    // Handle localStorage changes
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key?.startsWith('admin')) {
         loadAndExecuteAds();
@@ -37,7 +39,12 @@ const Index = () => {
     };
     
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    
+    // Cleanup
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   const handleExportPDF = async () => {
