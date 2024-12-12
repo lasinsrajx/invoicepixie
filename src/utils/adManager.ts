@@ -10,9 +10,14 @@ export const executeAdCode = (container: HTMLElement, adCode: string) => {
     // Clear existing content
     container.innerHTML = '';
     
+    // Create a wrapper div for the ad
+    const adWrapper = document.createElement('div');
+    adWrapper.className = 'ad-wrapper';
+    container.appendChild(adWrapper);
+    
     // First inject the non-script content
     const contentWithoutScripts = adCode.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-    container.innerHTML = contentWithoutScripts;
+    adWrapper.innerHTML = contentWithoutScripts;
 
     // Extract script tags
     const scriptMatch = adCode.match(/<script\b[^>]*>([\s\S]*?)<\/script>/gi);
@@ -21,59 +26,33 @@ export const executeAdCode = (container: HTMLElement, adCode: string) => {
       return;
     }
 
-    // Load scripts sequentially with proper initialization
-    const loadScripts = async () => {
-      for (const scriptCode of scriptMatch) {
-        await new Promise((resolve) => {
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = scriptCode;
-          const originalScript = tempDiv.querySelector('script');
-          
-          if (originalScript) {
-            const newScript = document.createElement('script');
-            
-            // Copy all attributes from original script
-            Array.from(originalScript.attributes).forEach(attr => {
-              newScript.setAttribute(attr.name, attr.value);
-            });
-
-            // Ensure proper script loading
-            newScript.async = true;
-            newScript.defer = true;
-            
-            // Add error handling attributes
-            newScript.setAttribute('crossorigin', 'anonymous');
-            newScript.setAttribute('data-cfasync', 'false');
-            
-            // Copy inline script content if present
-            if (originalScript.textContent) {
-              newScript.textContent = originalScript.textContent;
-            }
-
-            // Handle script loading
-            newScript.onload = () => {
-              console.log(`Script loaded successfully in ${container.id}`);
-              setTimeout(resolve, 100); // Small delay to ensure initialization
-            };
-            
-            newScript.onerror = (error) => {
-              console.error(`Error loading ad script in ${container.id}:`, error);
-              console.error('Script src:', newScript.src);
-              console.error('Script attributes:', Array.from(newScript.attributes).map(attr => `${attr.name}=${attr.value}`).join(', '));
-              resolve(null);
-            };
-
-            // Append script to document body instead of container
-            document.body.appendChild(newScript);
-          } else {
-            resolve(null);
-          }
+    // Load scripts sequentially
+    scriptMatch.forEach((scriptCode) => {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = scriptCode;
+      const originalScript = tempDiv.querySelector('script');
+      
+      if (originalScript) {
+        const newScript = document.createElement('script');
+        
+        // Copy all attributes from original script
+        Array.from(originalScript.attributes).forEach(attr => {
+          newScript.setAttribute(attr.name, attr.value);
         });
+
+        // Add required attributes for proper loading
+        newScript.async = true;
+        newScript.defer = true;
+        newScript.setAttribute('data-cfasync', 'false');
+        
+        // Copy inline script content if present
+        if (originalScript.textContent) {
+          newScript.textContent = originalScript.textContent;
+        }
+
+        // Append script to document body
+        document.body.appendChild(newScript);
       }
-    };
-    
-    loadScripts().catch(error => {
-      console.error('Error loading ad scripts:', error);
     });
     
     console.log(`Ad code execution completed for ${container.id}`);
@@ -111,5 +90,5 @@ export const loadAndExecuteAds = () => {
     } catch (error) {
       console.error('Error in loadAndExecuteAds:', error);
     }
-  }, 2000); // Increased to 2 seconds to ensure DOM and all resources are ready
+  }, 1500); // Wait for 1.5 seconds to ensure DOM is ready
 };
