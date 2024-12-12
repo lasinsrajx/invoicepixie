@@ -26,7 +26,7 @@ export const executeAdCode = (container: HTMLElement, adCode: string) => {
       return;
     }
 
-    // Load scripts sequentially
+    // Load scripts sequentially with proper error handling
     scriptMatch.forEach((scriptCode) => {
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = scriptCode;
@@ -40,15 +40,26 @@ export const executeAdCode = (container: HTMLElement, adCode: string) => {
           newScript.setAttribute(attr.name, attr.value);
         });
 
-        // Add required attributes for proper loading
+        // Add required attributes for proper loading and CORS handling
         newScript.async = true;
         newScript.defer = true;
+        newScript.crossOrigin = 'anonymous';
         newScript.setAttribute('data-cfasync', 'false');
         
         // Copy inline script content if present
         if (originalScript.textContent) {
           newScript.textContent = originalScript.textContent;
         }
+
+        // Add error handling
+        newScript.onerror = (error) => {
+          console.error(`Error loading script in ${container.id}:`, error);
+        };
+
+        // Add load handler
+        newScript.onload = () => {
+          console.log(`Script loaded successfully in ${container.id}`);
+        };
 
         // Append script to document body
         document.body.appendChild(newScript);
@@ -90,5 +101,5 @@ export const loadAndExecuteAds = () => {
     } catch (error) {
       console.error('Error in loadAndExecuteAds:', error);
     }
-  }, 1500); // Wait for 1.5 seconds to ensure DOM is ready
+  }, 2000); // Increased to 2 seconds to ensure DOM and resources are ready
 };
