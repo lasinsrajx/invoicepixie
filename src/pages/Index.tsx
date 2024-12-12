@@ -25,51 +25,89 @@ const Index = () => {
   const [topAdCode, setTopAdCode] = useState("");
   const [bottomAdCode, setBottomAdCode] = useState("");
 
+  const safeExecuteScript = (container: HTMLElement, adCode: string) => {
+    try {
+      // Clear existing content
+      container.innerHTML = '';
+      
+      // Create a wrapper div for the ad code
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = adCode;
+      
+      // Handle scripts separately
+      const scripts = wrapper.getElementsByTagName('script');
+      Array.from(scripts).forEach(oldScript => {
+        const newScript = document.createElement('script');
+        
+        // Copy all attributes
+        Array.from(oldScript.attributes).forEach(attr => {
+          try {
+            newScript.setAttribute(attr.name, attr.value);
+          } catch (err) {
+            console.warn('Failed to copy script attribute:', err);
+          }
+        });
+        
+        // Copy content
+        try {
+          newScript.textContent = oldScript.textContent;
+        } catch (err) {
+          console.warn('Failed to copy script content:', err);
+        }
+        
+        // Remove old script
+        oldScript.parentNode?.removeChild(oldScript);
+      });
+      
+      // Add the modified content to container
+      container.appendChild(wrapper);
+      
+      // Now add the scripts
+      Array.from(scripts).forEach(script => {
+        try {
+          const scriptEl = document.createElement('script');
+          Array.from(script.attributes).forEach(attr => {
+            scriptEl.setAttribute(attr.name, attr.value);
+          });
+          scriptEl.textContent = script.textContent;
+          container.appendChild(scriptEl);
+        } catch (err) {
+          console.error('Error executing ad script:', err);
+        }
+      });
+      
+      console.log('Successfully executed ad code');
+    } catch (err) {
+      console.error('Error in safeExecuteScript:', err);
+    }
+  };
+
   useEffect(() => {
-    // Load ad codes from localStorage
     const loadAdCodes = () => {
-      const savedTopAdCode = localStorage.getItem("adminTopAdCode");
-      const savedBottomAdCode = localStorage.getItem("adminBottomAdCode");
-      
-      console.log("Loading top ad code:", savedTopAdCode);
-      console.log("Loading bottom ad code:", savedBottomAdCode);
-      
-      if (savedTopAdCode) {
-        setTopAdCode(savedTopAdCode);
-        // Create a new div and insert the ad code
-        const topAdContainer = document.getElementById('top-ad-container');
-        if (topAdContainer) {
-          topAdContainer.innerHTML = savedTopAdCode;
-          // Execute any scripts in the ad code
-          const scripts = topAdContainer.getElementsByTagName('script');
-          Array.from(scripts).forEach(script => {
-            const newScript = document.createElement('script');
-            Array.from(script.attributes).forEach(attr => {
-              newScript.setAttribute(attr.name, attr.value);
-            });
-            newScript.appendChild(document.createTextNode(script.innerHTML));
-            script.parentNode.replaceChild(newScript, script);
-          });
+      try {
+        const savedTopAdCode = localStorage.getItem("adminTopAdCode");
+        const savedBottomAdCode = localStorage.getItem("adminBottomAdCode");
+        
+        console.log("Loading top ad code:", savedTopAdCode);
+        console.log("Loading bottom ad code:", savedBottomAdCode);
+        
+        if (savedTopAdCode) {
+          setTopAdCode(savedTopAdCode);
+          const topAdContainer = document.getElementById('top-ad-container');
+          if (topAdContainer) {
+            safeExecuteScript(topAdContainer, savedTopAdCode);
+          }
         }
-      }
-      
-      if (savedBottomAdCode) {
-        setBottomAdCode(savedBottomAdCode);
-        // Create a new div and insert the ad code
-        const bottomAdContainer = document.getElementById('bottom-ad-container');
-        if (bottomAdContainer) {
-          bottomAdContainer.innerHTML = savedBottomAdCode;
-          // Execute any scripts in the ad code
-          const scripts = bottomAdContainer.getElementsByTagName('script');
-          Array.from(scripts).forEach(script => {
-            const newScript = document.createElement('script');
-            Array.from(script.attributes).forEach(attr => {
-              newScript.setAttribute(attr.name, attr.value);
-            });
-            newScript.appendChild(document.createTextNode(script.innerHTML));
-            script.parentNode.replaceChild(newScript, script);
-          });
+        
+        if (savedBottomAdCode) {
+          setBottomAdCode(savedBottomAdCode);
+          const bottomAdContainer = document.getElementById('bottom-ad-container');
+          if (bottomAdContainer) {
+            safeExecuteScript(bottomAdContainer, savedBottomAdCode);
+          }
         }
+      } catch (err) {
+        console.error('Error loading ad codes:', err);
       }
     };
 
