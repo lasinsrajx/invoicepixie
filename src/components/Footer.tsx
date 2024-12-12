@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export const Footer = () => {
   return (
@@ -15,32 +16,32 @@ export const Footer = () => {
             <h3 className="text-sm font-semibold text-gray-600 tracking-wider uppercase">Quick Links</h3>
             <ul className="mt-4 space-y-4">
               <li>
-                <a href="#" className="text-base text-gray-500 hover:text-gray-900">
+                <Link to="/terms" className="text-base text-gray-500 hover:text-gray-900">
                   Terms of Service
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-base text-gray-500 hover:text-gray-900">
+                <Link to="/privacy" className="text-base text-gray-500 hover:text-gray-900">
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-base text-gray-500 hover:text-gray-900">
+                <Link to="/contact" className="text-base text-gray-500 hover:text-gray-900">
                   Contact Us
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
           <div>
             <h3 className="text-sm font-semibold text-gray-600 tracking-wider uppercase">Connect</h3>
             <div className="mt-4 flex space-x-6">
-              <a href="#" className="text-gray-500 hover:text-gray-900">
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-900">
                 Twitter
               </a>
-              <a href="#" className="text-gray-500 hover:text-gray-900">
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-900">
                 LinkedIn
               </a>
-              <a href="#" className="text-gray-500 hover:text-gray-900">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-900">
                 Facebook
               </a>
             </div>
