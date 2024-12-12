@@ -27,10 +27,15 @@ const Index = () => {
 
   useEffect(() => {
     // Load ad codes from localStorage
-    const savedTopAdCode = localStorage.getItem("adminTopAdCode") || "";
-    const savedBottomAdCode = localStorage.getItem("adminBottomAdCode") || "";
-    setTopAdCode(savedTopAdCode);
-    setBottomAdCode(savedBottomAdCode);
+    const savedTopAdCode = localStorage.getItem("adminTopAdCode");
+    const savedBottomAdCode = localStorage.getItem("adminBottomAdCode");
+    
+    if (savedTopAdCode) setTopAdCode(savedTopAdCode);
+    if (savedBottomAdCode) setBottomAdCode(savedBottomAdCode);
+    
+    // Log for debugging
+    console.log("Loaded top ad code:", savedTopAdCode);
+    console.log("Loaded bottom ad code:", savedBottomAdCode);
   }, []);
 
   const handleExportPDF = async () => {
@@ -119,8 +124,8 @@ const Index = () => {
             <InvoiceForm onUpdateInvoice={setInvoiceData} />
           </div>
           <div className="w-full">
-            <div className="sticky top-8">
-              <div id="invoice-preview" className="bg-white rounded-lg shadow-lg p-6">
+            <div className="sticky top-8 overflow-x-auto">
+              <div id="invoice-preview" className="bg-white rounded-lg shadow-lg p-6 min-w-[320px]">
                 <InvoicePreview {...invoiceData} template={template} />
               </div>
               <div className="mt-4 flex gap-4 justify-end">

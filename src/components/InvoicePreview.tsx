@@ -99,85 +99,85 @@ export const InvoicePreview = ({
   const styles = getTemplateStyles();
 
   return (
-    <Card className="p-8 bg-white shadow-lg max-w-[210mm] mx-auto" id="invoice-preview">
-      <div className="space-y-8">
+    <Card className="p-4 md:p-8 bg-white shadow-lg w-full overflow-x-auto" id="invoice-preview">
+      <div className="space-y-6 min-w-[280px]">
         {letterhead.showLogo && letterhead.logo && (
           <div className="flex justify-end">
-            <img src={letterhead.logo} alt="Company Logo" className="h-16 object-contain" />
+            <img src={letterhead.logo} alt="Company Logo" className="h-12 md:h-16 object-contain" />
           </div>
         )}
 
-        <div className="flex justify-between items-start">
+        <div className="flex flex-col md:flex-row justify-between items-start gap-4">
           <div>
-            <h1 className="text-4xl font-bold mb-4">INVOICE</h1>
+            <h1 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4">INVOICE</h1>
             {showFields.invoiceNumber && (
-              <p className="text-gray-600">Invoice Number: {invoiceNumber || 'INV-00001'}</p>
+              <p className="text-sm md:text-base text-gray-600">Invoice Number: {invoiceNumber || 'INV-00001'}</p>
             )}
             {showFields.invoiceDate && (
-              <p className="text-gray-600">Date: {invoiceDate || new Date().toLocaleDateString()}</p>
+              <p className="text-sm md:text-base text-gray-600">Date: {invoiceDate || new Date().toLocaleDateString()}</p>
             )}
           </div>
           <div className="text-right">
-            <h2 className={`text-2xl font-bold ${styles.accentColor}`}>{companyName || "Company Name"}</h2>
+            <h2 className={`text-xl md:text-2xl font-bold ${styles.accentColor}`}>{companyName || "Company Name"}</h2>
             {letterhead.showAddress && letterhead.companyAddress && (
-              <p className="text-gray-600 mt-2">{letterhead.companyAddress}</p>
+              <p className="text-sm md:text-base text-gray-600 mt-2">{letterhead.companyAddress}</p>
             )}
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h3 className={`text-lg font-semibold mb-2 ${styles.accentColor}`}>BILL TO:</h3>
+            <h3 className={`text-base md:text-lg font-semibold mb-2 ${styles.accentColor}`}>BILL TO:</h3>
             <p className="font-medium">{clientName || "Client Name"}</p>
-            <p className="text-gray-600 whitespace-pre-line">{clientAddress}</p>
+            <p className="text-sm md:text-base text-gray-600 whitespace-pre-line">{clientAddress}</p>
           </div>
           {showFields.paymentInfo && showFields.bankInfo && (
             <div>
-              <h3 className={`text-lg font-semibold mb-2 ${styles.accentColor}`}>PAYMENT INFORMATION:</h3>
-              <p className="text-gray-600">Bank: {bankName}</p>
-              <p className="text-gray-600">Account: {accountNumber}</p>
+              <h3 className={`text-base md:text-lg font-semibold mb-2 ${styles.accentColor}`}>PAYMENT INFORMATION:</h3>
+              <p className="text-sm md:text-base text-gray-600">Bank: {bankName}</p>
+              <p className="text-sm md:text-base text-gray-600">Account: {accountNumber}</p>
             </div>
           )}
         </div>
 
-        <div className="mt-8">
-          <table className="w-full">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[500px]">
             <thead>
               <tr className={`${styles.headerBg} text-white`}>
-                <th className="py-3 px-4 text-left">ITEM</th>
-                <th className="py-3 px-4 text-left">DESCRIPTION</th>
-                <th className="py-3 px-4 text-right">RATE</th>
-                <th className="py-3 px-4 text-right">AMOUNT</th>
+                <th className="py-2 md:py-3 px-2 md:px-4 text-left text-sm md:text-base">ITEM</th>
+                <th className="py-2 md:py-3 px-2 md:px-4 text-left text-sm md:text-base">DESCRIPTION</th>
+                <th className="py-2 md:py-3 px-2 md:px-4 text-right text-sm md:text-base">RATE</th>
+                <th className="py-2 md:py-3 px-2 md:px-4 text-right text-sm md:text-base">AMOUNT</th>
               </tr>
             </thead>
             <tbody>
               {lineItems.map((item, index) => (
                 <tr key={index} className={`border-b ${styles.borderColor}`}>
-                  <td className="py-3 px-4">{index + 1}</td>
-                  <td className="py-3 px-4">{item.description || "Item description"}</td>
-                  <td className="py-3 px-4 text-right">${item.unitPrice.toFixed(2)}</td>
-                  <td className="py-3 px-4 text-right">
+                  <td className="py-2 md:py-3 px-2 md:px-4 text-sm md:text-base">{index + 1}</td>
+                  <td className="py-2 md:py-3 px-2 md:px-4 text-sm md:text-base">{item.description || "Item description"}</td>
+                  <td className="py-2 md:py-3 px-2 md:px-4 text-right text-sm md:text-base">${item.unitPrice.toFixed(2)}</td>
+                  <td className="py-2 md:py-3 px-2 md:px-4 text-right text-sm md:text-base">
                     ${(item.quantity * item.unitPrice).toFixed(2)}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
 
-          <div className="mt-6 flex justify-end">
-            <div className="w-64 space-y-2">
-              <div className="flex justify-between border-b py-2">
-                <span>Subtotal:</span>
-                <span>${calculateSubtotal().toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between border-b py-2">
-                <span>Tax:</span>
-                <span>${calculateTax().toFixed(2)}</span>
-              </div>
-              <div className={`flex justify-between ${styles.headerBg} text-white py-2 px-4 mt-4`}>
-                <span className="font-bold">TOTAL:</span>
-                <span className="font-bold">${calculateTotal().toFixed(2)}</span>
-              </div>
+        <div className="flex justify-end">
+          <div className="w-full md:w-64 space-y-2">
+            <div className="flex justify-between border-b py-2 text-sm md:text-base">
+              <span>Subtotal:</span>
+              <span>${calculateSubtotal().toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between border-b py-2 text-sm md:text-base">
+              <span>Tax:</span>
+              <span>${calculateTax().toFixed(2)}</span>
+            </div>
+            <div className={`flex justify-between ${styles.headerBg} text-white py-2 px-4 mt-4 text-sm md:text-base`}>
+              <span className="font-bold">TOTAL:</span>
+              <span className="font-bold">${calculateTotal().toFixed(2)}</span>
             </div>
           </div>
         </div>
