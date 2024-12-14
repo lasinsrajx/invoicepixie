@@ -67,25 +67,27 @@ const Index = () => {
         scale: 2,
         useCORS: true,
         logging: false,
-        windowWidth: element.scrollWidth,
-        windowHeight: element.scrollHeight,
+        backgroundColor: null,
+        removeContainer: true,
+        windowWidth: 794, // A4 width in pixels at 96 DPI
+        windowHeight: 1123, // A4 height in pixels at 96 DPI
       });
       
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      
+      // Create PDF with A4 dimensions
       const pdf = new jsPDF({
-        format: 'a4',
+        orientation: 'portrait',
         unit: 'mm',
+        format: 'a4',
       });
 
-      const imgWidth = 210;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      const scaleFactor = imgHeight > 297 ? 297 / imgHeight : 1;
-      const finalWidth = imgWidth * scaleFactor;
-      const finalHeight = imgHeight * scaleFactor;
-      const xPosition = (210 - finalWidth) / 2;
-      const yPosition = (297 - finalHeight) / 2;
-
-      const imgData = canvas.toDataURL('image/jpeg', 1.0);
-      pdf.addImage(imgData, 'JPEG', xPosition, yPosition, finalWidth, finalHeight, undefined, 'FAST');
+      // Calculate dimensions to fit A4 while maintaining aspect ratio
+      const pdfWidth = 210; // A4 width in mm
+      const pdfHeight = 297; // A4 height in mm
+      
+      // Add image to PDF, fitting to A4 size
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       
       pdf.save("invoice.pdf");
       
