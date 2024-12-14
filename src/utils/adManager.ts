@@ -15,60 +15,62 @@ export const executeAdCode = (container: HTMLElement, adCode: string) => {
     adWrapper.className = 'ad-wrapper';
     container.appendChild(adWrapper);
     
-    // First inject the non-script content
+    // First inject any non-script HTML content
     const contentWithoutScripts = adCode.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
     adWrapper.innerHTML = contentWithoutScripts;
 
-    // Extract script tags
-    const scriptMatch = adCode.match(/<script\b[^>]*>([\s\S]*?)<\/script>/gi);
-    if (!scriptMatch) {
-      console.log('No script tags found in ad code');
-      return;
-    }
-
-    // Load scripts sequentially with proper error handling
-    scriptMatch.forEach((scriptCode) => {
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = scriptCode;
-      const originalScript = tempDiv.querySelector('script');
-      
-      if (originalScript) {
-        const newScript = document.createElement('script');
+    // Handle scripts separately
+    const scriptTags = adCode.match(/<script\b[^>]*>([\s\S]*?)<\/script>/gi);
+    
+    if (scriptTags) {
+      scriptTags.forEach((scriptTag) => {
+        const scriptElement = document.createElement('script');
         
-        // Copy all attributes from original script
-        Array.from(originalScript.attributes).forEach(attr => {
-          newScript.setAttribute(attr.name, attr.value);
-        });
-
-        // Add required attributes for proper loading and CORS handling
-        newScript.async = true;
-        newScript.defer = true;
-        newScript.crossOrigin = 'anonymous';
-        newScript.setAttribute('data-cfasync', 'false');
-        
-        // Copy inline script content if present
-        if (originalScript.textContent) {
-          newScript.textContent = originalScript.textContent;
+        // Extract src if present
+        const srcMatch = scriptTag.match(/src=["'](.*?)["']/);
+        if (srcMatch) {
+          scriptElement.src = srcMatch[1];
+          scriptElement.async = true;
         }
-
+        
+        // Extract inline code if present
+        const inlineCode = scriptTag.replace(/<script[^>]*>|<\/script>/gi, '').trim();
+        if (inlineCode && !srcMatch) {
+          scriptElement.text = inlineCode;
+        }
+        
         // Add error handling
-        newScript.onerror = (error) => {
+        scriptElement.onerror = (error) => {
           console.error(`Error loading script in ${container.id}:`, error);
+          // Create a fallback container if the script fails
+          const fallbackContainer = document.createElement('div');
+          fallbackContainer.id = `container-${container.id}`;
+          container.appendChild(fallbackContainer);
         };
 
         // Add load handler
-        newScript.onload = () => {
+        scriptElement.onload = () => {
           console.log(`Script loaded successfully in ${container.id}`);
+          // Ensure container exists for the ad
+          if (!document.getElementById(`container-${container.id}`)) {
+            const adContainer = document.createElement('div');
+            adContainer.id = `container-${container.id}`;
+            container.appendChild(adContainer);
+          }
         };
 
-        // Append script to document body
-        document.body.appendChild(newScript);
-      }
-    });
+        // Add to document
+        document.body.appendChild(scriptElement);
+      });
+    }
     
     console.log(`Ad code execution completed for ${container.id}`);
   } catch (error) {
     console.error(`Error executing ad code in ${container.id}:`, error);
+    // Create fallback container in case of error
+    const fallbackContainer = document.createElement('div');
+    fallbackContainer.id = `container-${container.id}`;
+    container.appendChild(fallbackContainer);
   }
 };
 
