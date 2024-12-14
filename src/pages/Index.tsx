@@ -17,32 +17,54 @@ const Index = () => {
     companyName: "",
     clientName: "",
     clientAddress: "",
-    bankName: "",
-    accountNumber: "",
+    bankName: localStorage.getItem("adminBankName") || "",
+    accountNumber: localStorage.getItem("adminAccountNumber") || "",
     invoiceNumber: "",
     invoiceDate: "",
     lineItems: [{ description: "", quantity: 1, unitPrice: 0, taxRate: 6 }],
   });
   const [template, setTemplate] = useState("modern");
 
+  // Function to update invoice data from admin settings
+  const updateInvoiceDataFromAdmin = () => {
+    console.log("Updating invoice data from admin settings");
+    setInvoiceData(prev => ({
+      ...prev,
+      bankName: localStorage.getItem("adminBankName") || prev.bankName,
+      accountNumber: localStorage.getItem("adminAccountNumber") || prev.accountNumber,
+    }));
+  };
+
   useEffect(() => {
     // Initial load of ads
     const timeoutId = setTimeout(() => {
       loadAndExecuteAds();
-    }, 1000); // Wait for 1 second after component mount
+    }, 2000);
+    
+    // Initial load of admin settings
+    updateInvoiceDataFromAdmin();
     
     // Handle localStorage changes
     const handleStorageChange = (e: StorageEvent) => {
+      console.log("Storage change detected:", e.key);
       if (e.key?.startsWith('admin')) {
+        console.log("Admin setting changed, updating ads and invoice data");
         loadAndExecuteAds();
+        updateInvoiceDataFromAdmin();
       }
     };
     
     window.addEventListener('storage', handleStorageChange);
     
+    // Poll for changes every 5 seconds as a fallback
+    const pollInterval = setInterval(() => {
+      updateInvoiceDataFromAdmin();
+    }, 5000);
+    
     // Cleanup
     return () => {
       clearTimeout(timeoutId);
+      clearInterval(pollInterval);
       window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
