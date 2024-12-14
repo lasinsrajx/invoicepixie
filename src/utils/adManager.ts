@@ -31,6 +31,7 @@ export const executeAdCode = (container: HTMLElement, adCode: string) => {
         if (srcMatch) {
           scriptElement.src = srcMatch[1];
           scriptElement.async = true;
+          scriptElement.crossOrigin = 'anonymous'; // Add crossOrigin attribute
         }
         
         // Extract inline code if present
@@ -43,9 +44,11 @@ export const executeAdCode = (container: HTMLElement, adCode: string) => {
         scriptElement.onerror = (error) => {
           console.error(`Error loading script in ${container.id}:`, error);
           // Create a fallback container if the script fails
-          const fallbackContainer = document.createElement('div');
-          fallbackContainer.id = `container-${container.id}`;
-          container.appendChild(fallbackContainer);
+          if (!document.getElementById(`container-${container.id}`)) {
+            const fallbackContainer = document.createElement('div');
+            fallbackContainer.id = `container-${container.id}`;
+            container.appendChild(fallbackContainer);
+          }
         };
 
         // Add load handler
@@ -68,9 +71,11 @@ export const executeAdCode = (container: HTMLElement, adCode: string) => {
   } catch (error) {
     console.error(`Error executing ad code in ${container.id}:`, error);
     // Create fallback container in case of error
-    const fallbackContainer = document.createElement('div');
-    fallbackContainer.id = `container-${container.id}`;
-    container.appendChild(fallbackContainer);
+    if (!document.getElementById(`container-${container.id}`)) {
+      const fallbackContainer = document.createElement('div');
+      fallbackContainer.id = `container-${container.id}`;
+      container.appendChild(fallbackContainer);
+    }
   }
 };
 
@@ -103,5 +108,5 @@ export const loadAndExecuteAds = () => {
     } catch (error) {
       console.error('Error in loadAndExecuteAds:', error);
     }
-  }, 2000); // Increased to 2 seconds to ensure DOM and resources are ready
+  }, 2000); // Keep 2 seconds delay to ensure DOM is ready
 };
