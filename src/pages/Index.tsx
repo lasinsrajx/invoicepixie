@@ -63,31 +63,41 @@ const Index = () => {
     if (!element) return;
 
     try {
+      // Remove borders temporarily for PDF generation
+      const originalStyle = element.style.cssText;
+      element.style.border = 'none';
+      element.style.boxShadow = 'none';
+      
+      // Set specific dimensions for A4
+      const a4Width = 210; // mm
+      const a4Height = 297; // mm
+      const pixelsPerMm = 3.78; // Standard 96 DPI converted to mm
+      
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
         logging: false,
-        backgroundColor: null,
-        removeContainer: true,
-        windowWidth: 794, // A4 width in pixels at 96 DPI
-        windowHeight: 1123, // A4 height in pixels at 96 DPI
+        backgroundColor: '#ffffff',
+        width: a4Width * pixelsPerMm,
+        height: a4Height * pixelsPerMm,
+        windowWidth: a4Width * pixelsPerMm,
+        windowHeight: a4Height * pixelsPerMm,
       });
-      
-      const imgData = canvas.toDataURL('image/png', 1.0);
-      
+
       // Create PDF with A4 dimensions
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4',
+        compress: true
       });
 
-      // Calculate dimensions to fit A4 while maintaining aspect ratio
-      const pdfWidth = 210; // A4 width in mm
-      const pdfHeight = 297; // A4 height in mm
+      // Calculate positioning to center content
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      pdf.addImage(imgData, 'PNG', 0, 0, a4Width, a4Height, '', 'FAST');
       
-      // Add image to PDF, fitting to A4 size
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      // Restore original styling
+      element.style.cssText = originalStyle;
       
       pdf.save("invoice.pdf");
       
