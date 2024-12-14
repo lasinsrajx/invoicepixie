@@ -2,9 +2,6 @@
 const ADMIN_SETTINGS_KEYS = {
   BANK_NAME: "adminBankName",
   ACCOUNT_NUMBER: "adminAccountNumber",
-  HEADER_SCRIPT: "adminHeaderScript",
-  TOP_AD_CODE: "adminTopAdCode",
-  BOTTOM_AD_CODE: "adminBottomAdCode",
 };
 
 export const getAdminSettings = () => {
@@ -12,18 +9,12 @@ export const getAdminSettings = () => {
   return {
     bankName: localStorage.getItem(ADMIN_SETTINGS_KEYS.BANK_NAME) || "",
     accountNumber: localStorage.getItem(ADMIN_SETTINGS_KEYS.ACCOUNT_NUMBER) || "",
-    headerScript: localStorage.getItem(ADMIN_SETTINGS_KEYS.HEADER_SCRIPT) || "",
-    topAdCode: localStorage.getItem(ADMIN_SETTINGS_KEYS.TOP_AD_CODE) || "",
-    bottomAdCode: localStorage.getItem(ADMIN_SETTINGS_KEYS.BOTTOM_AD_CODE) || "",
   };
 };
 
 export const saveAdminSettings = (settings: {
   bankName?: string;
   accountNumber?: string;
-  headerScript?: string;
-  topAdCode?: string;
-  bottomAdCode?: string;
 }) => {
   console.log("Saving admin settings to storage:", settings);
   
@@ -32,15 +23,6 @@ export const saveAdminSettings = (settings: {
   }
   if (settings.accountNumber !== undefined) {
     localStorage.setItem(ADMIN_SETTINGS_KEYS.ACCOUNT_NUMBER, settings.accountNumber);
-  }
-  if (settings.headerScript !== undefined) {
-    localStorage.setItem(ADMIN_SETTINGS_KEYS.HEADER_SCRIPT, settings.headerScript);
-  }
-  if (settings.topAdCode !== undefined) {
-    localStorage.setItem(ADMIN_SETTINGS_KEYS.TOP_AD_CODE, settings.topAdCode);
-  }
-  if (settings.bottomAdCode !== undefined) {
-    localStorage.setItem(ADMIN_SETTINGS_KEYS.BOTTOM_AD_CODE, settings.bottomAdCode);
   }
 
   // Dispatch a custom event to notify all tabs/windows
