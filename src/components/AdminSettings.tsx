@@ -5,41 +5,39 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { getAdminSettings, saveAdminSettings } from "@/utils/adminSettings";
 
 export const AdminSettings = () => {
   const { toast } = useToast();
   const [headerScript, setHeaderScript] = useState("");
   const [topAdCode, setTopAdCode] = useState("");
   const [bottomAdCode, setBottomAdCode] = useState("");
-  const [bankName, setBankName] = useState("First National Bank");
-  const [accountNumber, setAccountNumber] = useState("XXXX-XXXX-XXXX");
+  const [bankName, setBankName] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
 
   useEffect(() => {
-    // Load settings from localStorage
-    const savedHeaderScript = localStorage.getItem("adminHeaderScript") || "";
-    const savedTopAdCode = localStorage.getItem("adminTopAdCode") || "";
-    const savedBottomAdCode = localStorage.getItem("adminBottomAdCode") || "";
-    const savedBankName = localStorage.getItem("adminBankName") || "First National Bank";
-    const savedAccountNumber = localStorage.getItem("adminAccountNumber") || "XXXX-XXXX-XXXX";
-    
-    setHeaderScript(savedHeaderScript);
-    setTopAdCode(savedTopAdCode);
-    setBottomAdCode(savedBottomAdCode);
-    setBankName(savedBankName);
-    setAccountNumber(savedAccountNumber);
+    // Load settings using the utility function
+    const settings = getAdminSettings();
+    setHeaderScript(settings.headerScript);
+    setTopAdCode(settings.topAdCode);
+    setBottomAdCode(settings.bottomAdCode);
+    setBankName(settings.bankName);
+    setAccountNumber(settings.accountNumber);
   }, []);
 
   const saveSettings = () => {
-    // Save settings to localStorage with admin prefix to avoid conflicts
-    localStorage.setItem("adminHeaderScript", headerScript);
-    localStorage.setItem("adminTopAdCode", topAdCode);
-    localStorage.setItem("adminBottomAdCode", bottomAdCode);
-    localStorage.setItem("adminBankName", bankName);
-    localStorage.setItem("adminAccountNumber", accountNumber);
+    // Save settings using the utility function
+    saveAdminSettings({
+      headerScript,
+      topAdCode,
+      bottomAdCode,
+      bankName,
+      accountNumber,
+    });
     
     toast({
-      title: "Settings saved permanently",
-      description: "Your settings have been saved and will persist across sessions",
+      title: "Settings saved globally",
+      description: "Your settings have been saved and will be applied across all sessions",
     });
   };
 

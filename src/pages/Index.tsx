@@ -10,6 +10,7 @@ import { TemplateSelector } from "@/components/TemplateSelector";
 import { Footer } from "@/components/Footer";
 import { AdContainer } from "@/components/AdContainer";
 import { loadAndExecuteAds } from "@/utils/adManager";
+import { getAdminSettings, subscribeToAdminSettings } from "@/utils/adminSettings";
 
 const Index = () => {
   const { toast } = useToast();
@@ -17,55 +18,43 @@ const Index = () => {
     companyName: "",
     clientName: "",
     clientAddress: "",
-    bankName: localStorage.getItem("adminBankName") || "",
-    accountNumber: localStorage.getItem("adminAccountNumber") || "",
+    bankName: "",
+    accountNumber: "",
     invoiceNumber: "",
     invoiceDate: "",
     lineItems: [{ description: "", quantity: 1, unitPrice: 0, taxRate: 6 }],
   });
   const [template, setTemplate] = useState("modern");
 
-  // Function to update invoice data from admin settings
-  const updateInvoiceDataFromAdmin = () => {
-    console.log("Updating invoice data from admin settings");
+  useEffect(() => {
+    // Initial load of admin settings
+    const settings = getAdminSettings();
     setInvoiceData(prev => ({
       ...prev,
-      bankName: localStorage.getItem("adminBankName") || prev.bankName,
-      accountNumber: localStorage.getItem("adminAccountNumber") || prev.accountNumber,
+      bankName: settings.bankName,
+      accountNumber: settings.accountNumber,
     }));
-  };
 
-  useEffect(() => {
+    // Subscribe to admin settings changes
+    const unsubscribe = subscribeToAdminSettings((newSettings) => {
+      console.log("Admin settings updated, updating invoice data");
+      setInvoiceData(prev => ({
+        ...prev,
+        bankName: newSettings.bankName,
+        accountNumber: newSettings.accountNumber,
+      }));
+      loadAndExecuteAds();
+    });
+
     // Initial load of ads
     const timeoutId = setTimeout(() => {
       loadAndExecuteAds();
     }, 2000);
-    
-    // Initial load of admin settings
-    updateInvoiceDataFromAdmin();
-    
-    // Handle localStorage changes
-    const handleStorageChange = (e: StorageEvent) => {
-      console.log("Storage change detected:", e.key);
-      if (e.key?.startsWith('admin')) {
-        console.log("Admin setting changed, updating ads and invoice data");
-        loadAndExecuteAds();
-        updateInvoiceDataFromAdmin();
-      }
-    };
-    
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Poll for changes every 5 seconds as a fallback
-    const pollInterval = setInterval(() => {
-      updateInvoiceDataFromAdmin();
-    }, 5000);
-    
+
     // Cleanup
     return () => {
       clearTimeout(timeoutId);
-      clearInterval(pollInterval);
-      window.removeEventListener('storage', handleStorageChange);
+      unsubscribe();
     };
   }, []);
 
