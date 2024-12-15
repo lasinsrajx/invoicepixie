@@ -1,8 +1,5 @@
 export const getAdminSettings = () => {
-  const topAdCode = `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7532649863699049"
-     crossorigin="anonymous"></script>
-<!-- invoice web -->
-<ins class="adsbygoogle"
+  const defaultTopAdCode = `<ins class="adsbygoogle"
      style="display:block"
      data-ad-client="ca-pub-7532649863699049"
      data-ad-slot="6556707089"
@@ -12,10 +9,7 @@ export const getAdminSettings = () => {
      (adsbygoogle = window.adsbygoogle || []).push({});
 </script>`;
 
-  const bottomAdCode = `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7532649863699049"
-     crossorigin="anonymous"></script>
-<!-- invoice web 2 -->
-<ins class="adsbygoogle"
+  const defaultBottomAdCode = `<ins class="adsbygoogle"
      style="display:block"
      data-ad-client="ca-pub-7532649863699049"
      data-ad-slot="4846472922"
@@ -28,8 +22,8 @@ export const getAdminSettings = () => {
   return {
     bankName: localStorage.getItem('adminBankName') || '',
     accountNumber: localStorage.getItem('adminAccountNumber') || '',
-    topAdCode: localStorage.getItem('adminTopAdCode') || topAdCode,
-    bottomAdCode: localStorage.getItem('adminBottomAdCode') || bottomAdCode,
+    topAdCode: localStorage.getItem('adminTopAdCode') || defaultTopAdCode,
+    bottomAdCode: localStorage.getItem('adminBottomAdCode') || defaultBottomAdCode,
   };
 };
 

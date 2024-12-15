@@ -15,67 +15,21 @@ export const executeAdCode = (container: HTMLElement, adCode: string) => {
     adWrapper.className = 'ad-wrapper';
     container.appendChild(adWrapper);
     
-    // First inject any non-script HTML content
-    const contentWithoutScripts = adCode.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-    adWrapper.innerHTML = contentWithoutScripts;
-
-    // Handle scripts separately
-    const scriptTags = adCode.match(/<script\b[^>]*>([\s\S]*?)<\/script>/gi);
+    // Add the AdSense code
+    adWrapper.innerHTML = adCode;
     
-    if (scriptTags) {
-      scriptTags.forEach((scriptTag) => {
-        const scriptElement = document.createElement('script');
-        
-        // Extract src if present
-        const srcMatch = scriptTag.match(/src=["'](.*?)["']/);
-        if (srcMatch) {
-          scriptElement.src = srcMatch[1];
-          scriptElement.async = true;
-          scriptElement.crossOrigin = 'anonymous'; // Add crossOrigin attribute
-        }
-        
-        // Extract inline code if present
-        const inlineCode = scriptTag.replace(/<script[^>]*>|<\/script>/gi, '').trim();
-        if (inlineCode && !srcMatch) {
-          scriptElement.text = inlineCode;
-        }
-        
-        // Add error handling
-        scriptElement.onerror = (error) => {
-          console.error(`Error loading script in ${container.id}:`, error);
-          // Create a fallback container if the script fails
-          if (!document.getElementById(`container-${container.id}`)) {
-            const fallbackContainer = document.createElement('div');
-            fallbackContainer.id = `container-${container.id}`;
-            container.appendChild(fallbackContainer);
-          }
-        };
-
-        // Add load handler
-        scriptElement.onload = () => {
-          console.log(`Script loaded successfully in ${container.id}`);
-          // Ensure container exists for the ad
-          if (!document.getElementById(`container-${container.id}`)) {
-            const adContainer = document.createElement('div');
-            adContainer.id = `container-${container.id}`;
-            container.appendChild(adContainer);
-          }
-        };
-
-        // Add to document
-        document.body.appendChild(scriptElement);
-      });
+    // Try to push the ad
+    try {
+      if (window.adsbygoogle) {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      }
+    } catch (e) {
+      console.log('Error pushing ad:', e);
     }
     
     console.log(`Ad code execution completed for ${container.id}`);
   } catch (error) {
     console.error(`Error executing ad code in ${container.id}:`, error);
-    // Create fallback container in case of error
-    if (!document.getElementById(`container-${container.id}`)) {
-      const fallbackContainer = document.createElement('div');
-      fallbackContainer.id = `container-${container.id}`;
-      container.appendChild(fallbackContainer);
-    }
   }
 };
 
@@ -86,11 +40,11 @@ export const loadAndExecuteAds = () => {
 
   (window as any).adLoadTimeout = setTimeout(() => {
     try {
+      const settings = localStorage.getItem("adminSettings");
       const topAdCode = localStorage.getItem("adminTopAdCode");
       const bottomAdCode = localStorage.getItem("adminBottomAdCode");
       
-      console.log('Loading top ad code:', topAdCode);
-      console.log('Loading bottom ad code:', bottomAdCode);
+      console.log('Loading ads with settings:', settings);
       
       if (topAdCode) {
         const topContainer = document.getElementById('top-ad-container');
@@ -108,5 +62,5 @@ export const loadAndExecuteAds = () => {
     } catch (error) {
       console.error('Error in loadAndExecuteAds:', error);
     }
-  }, 2000); // Keep 2 seconds delay to ensure DOM is ready
+  }, 1000);
 };
