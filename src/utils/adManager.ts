@@ -22,6 +22,8 @@ export const executeAdCode = (container: HTMLElement, adCode: string) => {
     try {
       if (window.adsbygoogle) {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } else {
+        console.log('AdSense not initialized yet');
       }
     } catch (e) {
       console.log('Error pushing ad:', e);
