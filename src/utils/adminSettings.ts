@@ -1,57 +1,62 @@
-// Centralized admin settings management
-const ADMIN_SETTINGS_KEYS = {
-  BANK_NAME: "adminBankName",
-  ACCOUNT_NUMBER: "adminAccountNumber",
-};
-
 export const getAdminSettings = () => {
-  console.log("Getting admin settings from storage");
+  const topAdCode = `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7532649863699049"
+     crossorigin="anonymous"></script>
+<!-- invoice web -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-7532649863699049"
+     data-ad-slot="6556707089"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>`;
+
+  const bottomAdCode = `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7532649863699049"
+     crossorigin="anonymous"></script>
+<!-- invoice web 2 -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-7532649863699049"
+     data-ad-slot="4846472922"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>`;
+
   return {
-    bankName: localStorage.getItem(ADMIN_SETTINGS_KEYS.BANK_NAME) || "",
-    accountNumber: localStorage.getItem(ADMIN_SETTINGS_KEYS.ACCOUNT_NUMBER) || "",
+    bankName: localStorage.getItem('adminBankName') || '',
+    accountNumber: localStorage.getItem('adminAccountNumber') || '',
+    topAdCode: localStorage.getItem('adminTopAdCode') || topAdCode,
+    bottomAdCode: localStorage.getItem('adminBottomAdCode') || bottomAdCode,
   };
 };
 
 export const saveAdminSettings = (settings: {
-  bankName?: string;
-  accountNumber?: string;
+  bankName: string;
+  accountNumber: string;
+  topAdCode?: string;
+  bottomAdCode?: string;
 }) => {
-  console.log("Saving admin settings to storage:", settings);
+  localStorage.setItem('adminBankName', settings.bankName);
+  localStorage.setItem('adminAccountNumber', settings.accountNumber);
+  if (settings.topAdCode) localStorage.setItem('adminTopAdCode', settings.topAdCode);
+  if (settings.bottomAdCode) localStorage.setItem('adminBottomAdCode', settings.bottomAdCode);
   
-  if (settings.bankName !== undefined) {
-    localStorage.setItem(ADMIN_SETTINGS_KEYS.BANK_NAME, settings.bankName);
-  }
-  if (settings.accountNumber !== undefined) {
-    localStorage.setItem(ADMIN_SETTINGS_KEYS.ACCOUNT_NUMBER, settings.accountNumber);
-  }
-
-  // Dispatch a custom event to notify all tabs/windows
-  window.dispatchEvent(new CustomEvent('adminSettingsChanged', {
-    detail: settings
-  }));
+  // Trigger any subscribers
+  subscribers.forEach(callback => callback(getAdminSettings()));
 };
 
+const subscribers: Array<(settings: ReturnType<typeof getAdminSettings>) => void> = [];
+
 export const subscribeToAdminSettings = (callback: (settings: ReturnType<typeof getAdminSettings>) => void) => {
-  console.log("Subscribing to admin settings changes");
-  
-  const handleStorageChange = (e: StorageEvent) => {
-    console.log("Storage change detected:", e.key);
-    if (e.key?.startsWith('admin')) {
-      console.log("Admin setting changed, notifying subscriber");
-      callback(getAdminSettings());
-    }
-  };
-
-  const handleCustomEvent = (e: CustomEvent) => {
-    console.log("Admin settings custom event received:", e.detail);
-    callback(getAdminSettings());
-  };
-
-  window.addEventListener('storage', handleStorageChange);
-  window.addEventListener('adminSettingsChanged', handleCustomEvent as EventListener);
-
+  subscribers.push(callback);
+  callback(getAdminSettings()); // Call immediately with current settings
   return () => {
-    window.removeEventListener('storage', handleStorageChange);
-    window.removeEventListener('adminSettingsChanged', handleCustomEvent as EventListener);
+    const index = subscribers.indexOf(callback);
+    if (index > -1) {
+      subscribers.splice(index, 1);
+    }
   };
 };

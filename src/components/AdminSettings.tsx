@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { getAdminSettings, saveAdminSettings } from "@/utils/adminSettings";
 
@@ -10,23 +11,27 @@ export const AdminSettings = () => {
   const { toast } = useToast();
   const [bankName, setBankName] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
+  const [topAdCode, setTopAdCode] = useState("");
+  const [bottomAdCode, setBottomAdCode] = useState("");
 
   useEffect(() => {
-    // Load settings using the utility function
     const settings = getAdminSettings();
     setBankName(settings.bankName);
     setAccountNumber(settings.accountNumber);
+    setTopAdCode(settings.topAdCode);
+    setBottomAdCode(settings.bottomAdCode);
   }, []);
 
   const saveSettings = () => {
-    // Save settings using the utility function
     saveAdminSettings({
       bankName,
       accountNumber,
+      topAdCode,
+      bottomAdCode,
     });
     
     toast({
-      title: "Settings saved globally",
+      title: "Settings saved",
       description: "Your settings have been saved and will be applied across all sessions",
     });
   };
@@ -57,6 +62,26 @@ export const AdminSettings = () => {
               value={accountNumber}
               onChange={(e) => setAccountNumber(e.target.value)}
               placeholder="Enter account number"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="topAdCode">Top Ad Code</Label>
+            <Textarea
+              id="topAdCode"
+              value={topAdCode}
+              onChange={(e) => setTopAdCode(e.target.value)}
+              placeholder="Enter top ad code"
+              className="min-h-[100px]"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="bottomAdCode">Bottom Ad Code</Label>
+            <Textarea
+              id="bottomAdCode"
+              value={bottomAdCode}
+              onChange={(e) => setBottomAdCode(e.target.value)}
+              placeholder="Enter bottom ad code"
+              className="min-h-[100px]"
             />
           </div>
           <Button onClick={saveSettings} className="w-full">Save Settings</Button>
