@@ -11,7 +11,6 @@ const Admin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
   
-  // Simple analytics state (without database)
   const [analytics, setAnalytics] = useState({
     totalVisits: parseInt(localStorage.getItem("totalVisits") || "0"),
     invoicesGenerated: parseInt(localStorage.getItem("invoicesGenerated") || "0"),
@@ -25,12 +24,12 @@ const Admin = () => {
 
     // Update analytics
     const currentVisits = parseInt(localStorage.getItem("totalVisits") || "0");
-    localStorage.setItem("totalVisits", (currentVisits + 1).toString());
+    const newVisits = currentVisits + 1;
+    localStorage.setItem("totalVisits", newVisits.toString());
     localStorage.setItem("lastVisit", new Date().toLocaleString());
     
-    // Update analytics state
     setAnalytics({
-      totalVisits: currentVisits + 1,
+      totalVisits: newVisits,
       invoicesGenerated: parseInt(localStorage.getItem("invoicesGenerated") || "0"),
       lastVisit: new Date().toLocaleString()
     });
@@ -131,6 +130,21 @@ const Admin = () => {
       </div>
 
       <AdminSettings />
+      
+      <Button 
+        onClick={() => {
+          localStorage.removeItem("adminAuth");
+          setIsAuthenticated(false);
+          toast({
+            title: "Logged out",
+            description: "Successfully logged out from admin panel",
+          });
+        }}
+        variant="destructive"
+        className="mt-4"
+      >
+        Logout
+      </Button>
     </div>
   );
 };
