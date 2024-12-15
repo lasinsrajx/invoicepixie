@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { AdminSettings } from "@/components/AdminSettings";
 import { TemplateSelector } from "@/components/TemplateSelector";
 import { Footer } from "@/components/Footer";
 import { AdContainer } from "@/components/AdContainer";
@@ -118,12 +117,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8">
-          <h1 className="text-3xl font-bold text-[#1e3a8a] mb-4 lg:mb-0">
-            Invoice Generator
-          </h1>
-          <AdminSettings />
-        </div>
+        <h1 className="text-3xl font-bold text-[#1e3a8a] mb-8">
+          Invoice Generator
+        </h1>
 
         <AdContainer position="top" className="mb-8" />
 
