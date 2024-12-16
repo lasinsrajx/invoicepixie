@@ -24,6 +24,7 @@ export const getAdminSettings = () => {
     accountNumber: localStorage.getItem('adminAccountNumber') || '',
     topAdCode: localStorage.getItem('adminTopAdCode') || defaultTopAdCode,
     bottomAdCode: localStorage.getItem('adminBottomAdCode') || defaultBottomAdCode,
+    fullPageAdCode: localStorage.getItem('adminFullPageAdCode') || defaultTopAdCode,
   };
 };
 
@@ -32,11 +33,16 @@ export const saveAdminSettings = (settings: {
   accountNumber: string;
   topAdCode?: string;
   bottomAdCode?: string;
+  fullPageAdCode?: string;
 }) => {
   localStorage.setItem('adminBankName', settings.bankName);
   localStorage.setItem('adminAccountNumber', settings.accountNumber);
   if (settings.topAdCode) localStorage.setItem('adminTopAdCode', settings.topAdCode);
   if (settings.bottomAdCode) localStorage.setItem('adminBottomAdCode', settings.bottomAdCode);
+  if (settings.fullPageAdCode) localStorage.setItem('adminFullPageAdCode', settings.fullPageAdCode);
+  
+  // Store complete settings object for ads.html
+  localStorage.setItem('adminSettings', JSON.stringify(settings));
   
   // Trigger any subscribers
   subscribers.forEach(callback => callback(getAdminSettings()));

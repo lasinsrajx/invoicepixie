@@ -13,6 +13,7 @@ export const AdminSettings = () => {
   const [accountNumber, setAccountNumber] = useState("");
   const [topAdCode, setTopAdCode] = useState("");
   const [bottomAdCode, setBottomAdCode] = useState("");
+  const [fullPageAdCode, setFullPageAdCode] = useState("");
 
   useEffect(() => {
     const settings = getAdminSettings();
@@ -20,6 +21,7 @@ export const AdminSettings = () => {
     setAccountNumber(settings.accountNumber);
     setTopAdCode(settings.topAdCode);
     setBottomAdCode(settings.bottomAdCode);
+    setFullPageAdCode(settings.fullPageAdCode || '');
   }, []);
 
   const saveSettings = () => {
@@ -28,6 +30,7 @@ export const AdminSettings = () => {
       accountNumber,
       topAdCode,
       bottomAdCode,
+      fullPageAdCode,
     });
     
     toast({
@@ -81,6 +84,16 @@ export const AdminSettings = () => {
               value={bottomAdCode}
               onChange={(e) => setBottomAdCode(e.target.value)}
               placeholder="Enter bottom ad code"
+              className="min-h-[100px]"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="fullPageAdCode">Full Page Ad Code (ads.html)</Label>
+            <Textarea
+              id="fullPageAdCode"
+              value={fullPageAdCode}
+              onChange={(e) => setFullPageAdCode(e.target.value)}
+              placeholder="Enter full page ad code"
               className="min-h-[100px]"
             />
           </div>
